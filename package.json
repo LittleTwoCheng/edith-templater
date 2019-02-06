@@ -14,9 +14,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "BABEL_ENV=development electron-webpack dev",
+    "dev": "electron-webpack dev",
     "compile": "electron-webpack",
-    "build": "electron-builder -m",
+    "build": "electron-builder -w",
     "dist": "yarn compile && yarn build",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
   },
