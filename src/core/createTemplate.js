@@ -11,7 +11,8 @@ const compose = (templatePath, outputDir) => {
     return fields => {
         //Load the docx file as a binary
         var content = fs.readFileSync(
-            path.resolve(__dirname, `../../${templatePath}`),
+            //path.resolve(__dirname, `../../${templatePath}`),
+            templatePath,
             "binary"
         );
 

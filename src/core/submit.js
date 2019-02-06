@@ -25,7 +25,7 @@ export default fields => {
     validateForm(fields);
 
     const createTemplate = compose(
-        "static/default.docx",
+        __static + "/default.docx",
         app.getPath("downloads")
     );
     return createTemplate(fields);
