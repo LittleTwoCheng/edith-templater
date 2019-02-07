@@ -9,7 +9,6 @@ const uuid = require("./uuid");
 
 const compose = (templatePath, outputDir) => {
     return (fields, filePrefix = "wordTemplater-") => {
-        return "/Users/bencheng/Downloads/wordTemplater-FAKE.docx";
         //Load the docx file as a binary
         var content = fs.readFileSync(
             //path.resolve(__dirname, `../../${templatePath}`),
