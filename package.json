@@ -16,26 +16,37 @@
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
-    "build": "electron-builder -w",
+    "build-win": "electron-builder -w",
+    "build-mac": "electron-builder -m",
+    "build": "electron-builder -mw",
+    "dist-win": "yarn compile && yarn build-win",
+    "dist-mac": "yarn compile && yarn build-mac",
     "dist": "yarn compile && yarn build",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
   },
   "build": {
     "mac": {
-      "target": ["dmg","zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "target": "portable"
     }
   },
   "dependencies": {
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
+    "date-fns": "^1.30.1",
+    "docxtemplater": "^3.9.7",
+    "jszip": "^2.6.1",
+    "notistack": "^0.4.2",
     "react": "^16.8.0-alpha.1",
     "react-dom": "^16.8.0-alpha.1",
     "source-map-support": "^0.5.10",
-    "jszip": "^2.6.1",
     "tv4": "^1.3.0",
-    "uid-generator": "^1.0.0",
-    "docxtemplater": "^3.9.7"
+    "uid-generator": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -43,6 +54,7 @@
     "@babel/preset-react": "^7.0.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.0.5",
+    "cross-env": "^5.2.0",
     "electron": "4.0.1",
     "electron-builder": "20.38.4",
     "electron-webpack": "^2.6.2",

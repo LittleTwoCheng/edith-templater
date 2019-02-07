@@ -9,5 +9,5 @@ const getMsg = error => {
 };
 
 export default ({ name, error }) => (
-    <div className={`error error--${name}`}>{getMsg(error)}</div>
+    <span className={`error error--${name}`}>{getMsg(error)}</span>
 );

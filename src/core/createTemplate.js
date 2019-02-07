@@ -8,7 +8,8 @@ const createError = require("./createError");
 const uuid = require("./uuid");
 
 const compose = (templatePath, outputDir) => {
-    return fields => {
+    return (fields, filePrefix = "wordTemplater-") => {
+        return "/Users/bencheng/Downloads/wordTemplater-FAKE.docx";
         //Load the docx file as a binary
         var content = fs.readFileSync(
             //path.resolve(__dirname, `../../${templatePath}`),
@@ -37,7 +38,7 @@ const compose = (templatePath, outputDir) => {
 
         var buf = doc.getZip().generate({ type: "nodebuffer" });
 
-        var randomFileName = `wordTemplater-${uuid()}`;
+        var randomFileName = `${filePrefix}${uuid(4)}`;
         const outputPath = path.resolve(
             __dirname,
             `${outputDir}/${randomFileName}.docx`

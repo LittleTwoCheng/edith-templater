@@ -1,10 +1,37 @@
 import tv4 from "tv4";
 import createError from "../core/createError";
 
+tv4.setErrorReporter(function(error, data, schema) {
+    switch (error.code) {
+        case tv4.errorCodes.STRING_PATTERN:
+            return `Incorrect Format. [CODE: ${error.code}]`;
+        case tv4.errorCodes.STRING_LENGTH_SHORT:
+            if (!error.params.length) return `Required.`;
+
+            return error.message;
+
+        default:
+            return error.message;
+    }
+});
+
+const extractFieldName = dataPath => {
+    return dataPath.replace("/", "");
+};
 export const compose = schema => {
     return fields => {
         var result = tv4.validateMultiple(fields, schema);
-        if (!result) throw createError("Validation Failed.", result.errors);
+        console.log("Validation", { fields, schema, result });
+
+        if (!result.valid)
+            throw createError(
+                "Validation Failed.",
+                result.errors.reduce((merged, error) => {
+                    console.log({ error });
+                    merged[extractFieldName(error.dataPath)] = error.message;
+                    return merged;
+                }, {})
+            );
 
         return true;
     };
@@ -16,16 +43,11 @@ export const SCHEMAS = {
     }),
     OPTIONS: options => ({
         type: "string",
-        pattern: `^(${options.join("|")})$`
+        pattern: `^(${options.join("|")})$`,
+        minLength: 1
     }),
-    STRING: () => ({
-        type: "string"
-    }),
-    PATTERN: pattern => ({
+    STRING: ({ ...rules }) => ({
         type: "string",
-        pattern
-    }),
-    ADDRESS: () => ({
-        type: "string"
+        ...rules
     })
 };
