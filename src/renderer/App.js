@@ -22,6 +22,8 @@ import Slide from "@material-ui/core/Slide";
 
 import { withSnackbar } from "notistack";
 
+import { get as getCache, set as setCache } from "../core/cache";
+
 const COUNTRY_OF_ORIGINS = ["CHINA", "HONG KONG(CHINA)"];
 const COUNTRY_OF_ORIGIN_OPTIONS = COUNTRY_OF_ORIGINS.reduce(
     (options, cor) => ({
@@ -61,11 +63,15 @@ const TEST_FIELDS = {
     buyer_address: "Buyer Building, Japan"
 };
 
+const SUCCESS_STACK_CACHE_NAME = "success_stack";
+const INITIAL_SUCCESS_STACK = getCache(SUCCESS_STACK_CACHE_NAME, []);
+const MAX_SUCCESS_STACK_OFFSET = 10;
+
 function App({ enqueueSnackbar }) {
     const [fields, setFields] = useState(DEFAULT_FIELDS);
     const [errors, setErrors] = useState({});
     const [isLoading, setLoading] = useState(false);
-    const [successStack, setSuccessStack] = useState([]);
+    const [successStack, setSuccessStack] = useState(INITIAL_SUCCESS_STACK);
 
     const onSubmit = event => {
         console.log("submit");
@@ -78,15 +84,20 @@ function App({ enqueueSnackbar }) {
 
             setLoading(false);
             setErrors({});
-            setSuccessStack(
-                [
-                    {
-                        id: uuid(),
-                        time: fnsFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
-                        filePath
-                    }
-                ].concat(successStack)
-            );
+
+            const updatedSuccessStack = [
+                {
+                    id: uuid(),
+                    time: fnsFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
+                    filePath
+                }
+            ].concat(successStack);
+
+            updatedSuccessStack.splice(MAX_SUCCESS_STACK_OFFSET, 1);
+
+            setCache(SUCCESS_STACK_CACHE_NAME, updatedSuccessStack);
+            setSuccessStack(updatedSuccessStack);
+
             enqueueSnackbar("Created!", {
                 variant: "success",
                 autoHideDuration: 3000
@@ -255,7 +266,7 @@ function App({ enqueueSnackbar }) {
             {successStack.length ? (
                 <Page elevation={4}>
                     <Typography align="center" variant="h5" component="h1">
-                        Downloads
+                        Latest Downloads
                     </Typography>
                     {successStack.map(success => (
                         <Slide
