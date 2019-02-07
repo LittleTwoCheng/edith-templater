@@ -72,5 +72,5 @@ export default fields => {
         __static + "/default.docx",
         app.getPath("downloads")
     );
-    return createTemplate(fields, `${fields.report_no}-`);
+    return createTemplate(fields, `Report_${fields.report_no}_`);
 };
