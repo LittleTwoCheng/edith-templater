@@ -9,17 +9,26 @@ const styles = theme => ({
     },
     rightIcon: {
         marginLeft: theme.spacing.unit
-    }
+    },
+    iconOnly: {}
 });
 
+export const ICON_LEFT = "left";
+export const ICON_RIGHT = "right";
+export const ICON_ONLY = "icon_only";
+
 export default withStyles(styles)(
-    ({ children, classes, Icon, iconPosition = "left", ...rest }) => (
+    ({ children, classes, Icon, iconPosition = ICON_LEFT, ...rest }) => (
         <Btn {...rest}>
-            {iconPosition === "left" ? (
+            {iconPosition === ICON_LEFT ? (
                 <Icon className={classes.leftIcon} />
             ) : null}
-            {children}
-            {iconPosition === "right" ? (
+            {iconPosition === ICON_ONLY ? (
+                <Icon className={classes.iconOnly} />
+            ) : (
+                children
+            )}
+            {iconPosition === ICON_RIGHT ? (
                 <Icon className={classes.rightIcon} />
             ) : null}
         </Btn>
