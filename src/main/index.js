@@ -3,6 +3,7 @@
 import { app, BrowserWindow } from "electron";
 import * as path from "path";
 import { format as formatUrl } from "url";
+import getTemplateNames from "./getTemplateNames";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -66,4 +67,7 @@ app.on("activate", () => {
 // create main BrowserWindow when electron is ready
 app.on("ready", () => {
   mainWindow = createMainWindow();
+  mainWindow.webContents.on("did-finish-load", () => {
+    mainWindow.webContents.send("templateLoaded", getTemplateNames(__static));
+  });
 });

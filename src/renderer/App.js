@@ -11,33 +11,30 @@ import DropdownInput from "../component/input/Dropdown";
 import ErrorMsg from "../component/input/ErrorMsg";
 import Actions from "../component/Actions";
 import Btn from "../component/Btn";
-import IconBtn from "../component/IconBtn";
+import IconBtn, { ICON_ONLY } from "../component/IconBtn";
 import Divider from "../component/Divider";
 import FileLink from "../component/electron/FileLink";
 
 import Typography from "@material-ui/core/Typography";
 import DoneIcon from "@material-ui/icons/Done";
 import SearchIcon from "@material-ui/icons/Search";
+import DeleteIcon from "@material-ui/icons/Delete";
 import Slide from "@material-ui/core/Slide";
 
 import { withSnackbar } from "notistack";
 
 import { get as getCache, set as setCache } from "../core/cache";
 
-const COUNTRY_OF_ORIGINS = ["CHINA", "HONG KONG(CHINA)"];
-const COUNTRY_OF_ORIGIN_OPTIONS = COUNTRY_OF_ORIGINS.reduce(
-    (options, cor) => ({
-        ...options,
-        [cor]: cor
-    }),
-    {}
-);
+import COUNTRY_OF_ORIGINS, {
+    options as COUNTRY_OF_ORIGIN_OPTIONS
+} from "../constant/countryOfOrigin";
 
 const TODAY_DATE = fnsFormat(new Date(), "YYYY-MM-DD");
 const DEFAULT_FIELDS = {
     report_no: "",
     acceptance_date: TODAY_DATE,
     report_delivery_date: TODAY_DATE,
+    age_grade: "",
     applicant_name: "",
     applicant_address: "",
     product_name: "",
@@ -52,6 +49,7 @@ const TEST_FIELDS = {
     report_no: "123456789-T",
     acceptance_date: "2019-02-08",
     report_delivery_date: "2019-03-31",
+    age_grade: "Ages 6 years old or over",
     applicant_name: "John, Applicant Ho",
     applicant_address: "Applicant Building, Tin Shui Wai",
     product_name: "Pokemon Toy",
@@ -67,12 +65,15 @@ const SUCCESS_STACK_CACHE_NAME = "success_stack";
 const INITIAL_SUCCESS_STACK = getCache(SUCCESS_STACK_CACHE_NAME, []);
 const MAX_SUCCESS_STACK_OFFSET = 10;
 
-function App({ enqueueSnackbar }) {
-    const [fields, setFields] = useState(DEFAULT_FIELDS);
+function App({ enqueueSnackbar, templateNames }) {
+    const [fields, setFields] = useState({
+        ...DEFAULT_FIELDS,
+        template_name: templateNames[0]
+    });
     const [errors, setErrors] = useState({});
     const [isLoading, setLoading] = useState(false);
     const [successStack, setSuccessStack] = useState(INITIAL_SUCCESS_STACK);
-
+    console.log("render", { fields });
     const onSubmit = event => {
         console.log("submit");
         event.stopPropagation();
@@ -118,14 +119,23 @@ function App({ enqueueSnackbar }) {
     };
     const onChange = (event, changedFields) => {
         console.log("field change", { changedFields });
+
         setFields({
             ...fields,
             ...changedFields
         });
+
+        //clean up error
+        setErrors({});
+    };
+    const onRemoveStack = () => {
+        const EMPTY = [];
+        setCache(SUCCESS_STACK_CACHE_NAME, EMPTY);
+        setSuccessStack(EMPTY);
     };
     const onTestClick = () => {
         console.log("TestClick");
-        setFields(TEST_FIELDS);
+        setFields({ ...fields, ...TEST_FIELDS });
     };
     console.log("App.render");
 
@@ -143,7 +153,14 @@ function App({ enqueueSnackbar }) {
                         value={fields.report_no}
                         errors={errors}
                         onChange={onChange}
-                        fullWidth
+                    />
+                    <TextInput
+                        label="Age Grade (Optional)"
+                        placeholder="e.g. Ages 6 years old or over"
+                        name="age_grade"
+                        value={fields.age_grade}
+                        errors={errors}
+                        onChange={onChange}
                     />
                     <DateInput
                         label="Acceptance Date"
@@ -170,7 +187,7 @@ function App({ enqueueSnackbar }) {
                         fullWidth
                     />
                     <TextInput
-                        label="Item No."
+                        label="Item No. (Optional)"
                         placeholder="e.g. 65432"
                         name="item_no"
                         value={fields.item_no}
@@ -252,6 +269,18 @@ function App({ enqueueSnackbar }) {
                     >
                         Test
                     </Btn>
+                    <DropdownInput
+                        label="Choose Docx Template"
+                        name="template_name"
+                        value={fields.template_name}
+                        options={templateNames.reduce((options, name) => {
+                            options[name] = name;
+                            return options;
+                        }, {})}
+                        errors={errors}
+                        onChange={onChange}
+                        fullWidth
+                    />
                     <IconBtn
                         variant="contained"
                         type="submit"
@@ -266,7 +295,13 @@ function App({ enqueueSnackbar }) {
             {successStack.length ? (
                 <Page elevation={4}>
                     <Typography align="center" variant="h5" component="h1">
-                        Latest Downloads
+                        Latest Downloads{" "}
+                        <IconBtn
+                            variant="text"
+                            Icon={DeleteIcon}
+                            iconPosition={ICON_ONLY}
+                            onClick={onRemoveStack}
+                        />
                     </Typography>
                     {successStack.map(success => (
                         <Slide

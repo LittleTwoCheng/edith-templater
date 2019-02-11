@@ -18,6 +18,9 @@ tv4.setErrorReporter(function(error, data, schema) {
 const extractFieldName = dataPath => {
     return dataPath.replace("/", "");
 };
+const escapeRegExp = string => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+};
 export const compose = schema => {
     return fields => {
         var result = tv4.validateMultiple(fields, schema);
@@ -43,7 +46,7 @@ export const SCHEMAS = {
     }),
     OPTIONS: options => ({
         type: "string",
-        pattern: `^(${options.join("|")})$`,
+        pattern: `^(${options.map(escapeRegExp).join("|")})$`,
         minLength: 1
     }),
     STRING: ({ ...rules }) => ({

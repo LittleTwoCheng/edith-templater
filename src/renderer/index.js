@@ -7,11 +7,15 @@ import SnackbarProvider from "./SnackbarProvider";
 
 import THEME from "./theme";
 
-render(
-    <StyleProvider theme={THEME}>
-        <SnackbarProvider>
-            <App />
-        </SnackbarProvider>
-    </StyleProvider>,
-    document.getElementById("app")
-);
+require("electron").ipcRenderer.on("templateLoaded", (event, templateNames) => {
+    console.log("templateLoaded", templateNames);
+
+    render(
+        <StyleProvider theme={THEME}>
+            <SnackbarProvider>
+                <App templateNames={templateNames} />
+            </SnackbarProvider>
+        </StyleProvider>,
+        document.getElementById("app")
+    );
+});
