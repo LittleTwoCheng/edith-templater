@@ -48,7 +48,7 @@ export default withStyles(styles)(
                     {...rest}
                 >
                     <MenuItem value="">
-                        <em>None</em>
+                        <em>{` -- ${label} -- `}</em>
                     </MenuItem>
                     {Object.entries(options).map(([val, label]) => (
                         <MenuItem key={val} value={val}>
