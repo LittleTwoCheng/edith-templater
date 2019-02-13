@@ -85,7 +85,11 @@ const formMessageMapping = {
 };
 
 export default ({ template_name, ...fields }) => {
-    console.log("fields", { fields, template_name });
+    console.log("submit", {
+        fields,
+        template_name,
+        path: __static + `/${template_name}`
+    });
     validateForm(fields);
 
     const createTemplate = compose(

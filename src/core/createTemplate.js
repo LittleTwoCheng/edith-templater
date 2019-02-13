@@ -1,6 +1,8 @@
 const JSZip = require("jszip");
 const Docxtemplater = require("docxtemplater");
 
+// 🚨 TODO use this instead: https://github.com/guigrpa/docx-templates
+
 const fs = require("fs");
 const path = require("path");
 

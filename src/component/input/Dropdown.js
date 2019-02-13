@@ -28,6 +28,7 @@ export default withStyles(styles)(
         fullWidth = false,
         errors = {},
         data = null,
+        helperText = "",
         ...rest
     }) => {
         return (
@@ -56,9 +57,13 @@ export default withStyles(styles)(
                         </MenuItem>
                     ))}
                 </Select>
-                {!!errors[name] ? (
+                {!!errors[name] || helperText ? (
                     <FormHelperText>
-                        <ErrorMsg name={name} error={errors[name]} />
+                        {!!errors[name] ? (
+                            <ErrorMsg name={name} error={errors[name]} />
+                        ) : (
+                            helperText
+                        )}
                     </FormHelperText>
                 ) : null}
             </FormControl>

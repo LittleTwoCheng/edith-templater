@@ -14,8 +14,8 @@ const styles = theme => ({
         padding: theme.spacing.unit * 2
     }
 });
-export default withStyles(styles)(({ classes, children }) => (
-    <div className={classes.page}>
+export default withStyles(styles)(({ classes, children, style = {} }) => (
+    <div className={classes.page} style={style}>
         <Paper className={classes.paper}>{children}</Paper>
     </div>
 ));

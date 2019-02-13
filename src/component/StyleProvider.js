@@ -4,7 +4,7 @@ import React, { useMemo, Fragment } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
-const StyleProvider = ({ children, theme = DEFAULT_THEME }) => {
+const StyleProvider = ({ children, theme }) => {
     const memoizedTheme = useMemo(() => createMuiTheme(theme), [theme]);
     return (
         <Fragment>

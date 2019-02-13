@@ -52,5 +52,13 @@ export const SCHEMAS = {
     STRING: ({ ...rules }) => ({
         type: "string",
         ...rules
+    }),
+    NUMBER: ({ ...rules }) => ({
+        type: "number",
+        ...rules
+    }),
+    INT: ({ ...rules }) => ({
+        type: "integer",
+        ...rules
     })
 };
