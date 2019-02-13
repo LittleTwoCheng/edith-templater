@@ -297,6 +297,7 @@ function App({ enqueueSnackbar, templateNames }) {
                     <Typography align="center" variant="h5" component="h1">
                         Latest Downloads{" "}
                         <IconBtn
+                            title="Clean up the list"
                             variant="text"
                             Icon={DeleteIcon}
                             iconPosition={ICON_ONLY}
