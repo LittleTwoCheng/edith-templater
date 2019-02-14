@@ -26,6 +26,7 @@ export default withStyles(styles)(
         errors = {},
         data = null,
         placeholder = "",
+        helperText = "",
         ...rest
     }) => (
         <FormControl
@@ -48,9 +49,13 @@ export default withStyles(styles)(
                 placeholder={placeholder}
                 {...rest}
             />
-            {!!errors[name] ? (
+            {!!errors[name] || helperText ? (
                 <FormHelperText id={`helperText-${name}`}>
-                    <ErrorMsg name={name} error={errors[name]} />
+                    {!!errors[name] ? (
+                        <ErrorMsg name={name} error={errors[name]} />
+                    ) : (
+                        helperText
+                    )}
                 </FormHelperText>
             ) : null}
         </FormControl>
