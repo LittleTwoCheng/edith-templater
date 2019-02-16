@@ -49,7 +49,7 @@ const TEST_FIELDS = {
     report_no: "123456789-T",
     acceptance_date: "2019-02-08",
     report_delivery_date: "2019-03-31",
-    age_grade: "Ages 6 years old or over",
+    age_grade: "6 years old and over",
     applicant_name: "John, Applicant Ho",
     applicant_address: "Applicant Building, Tin Shui Wai",
     product_name: "Pokemon Toy",
@@ -156,7 +156,7 @@ function App({ enqueueSnackbar, templateNames }) {
                     />
                     <TextInput
                         label="Age Grade (Optional)"
-                        placeholder="e.g. Ages 6 years old or over"
+                        placeholder="e.g. 6 years old and over"
                         name="age_grade"
                         value={fields.age_grade}
                         errors={errors}
