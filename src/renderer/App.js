@@ -39,17 +39,19 @@ const DEFAULT_FIELDS = {
     client_specified_testing_age_grade: "",
     applicant_name: "",
     applicant_address: "",
-    product_name: "",
-    item_no: "",
+    product_names: [""],
+    item_nos: [""],
     country_of_origin: "",
     manufacturer_name: "",
     manufacturer_address: "",
     buyer_name: "",
     buyer_address: "",
+    tests: [""],
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
-    check_item_no: true
+    check_item_nos: true,
+    check_tests: true
 };
 const TEST_FIELDS = {
     report_no: "123456789-S1,2-R",
@@ -60,17 +62,23 @@ const TEST_FIELDS = {
     client_specified_testing_age_grade: "6 years old and over",
     applicant_name: "John, Applicant Ho",
     applicant_address: "Applicant Building, Tin Shui Wai",
-    product_name: "Pokemon Toy",
-    item_no: "654321",
+    product_names: [
+        "Pokemon Toy(Red)",
+        "Pokemon Toy(Blue)",
+        "Pokemon Toy(Green)"
+    ],
+    item_nos: ["654321", "765432"],
     country_of_origin: COUNTRY_OF_ORIGINS[0],
     manufacturer_name: "Man Lee",
     manufacturer_address: "Manufacturer Building, China",
     buyer_name: "Buyer Tom",
     buyer_address: "Buyer Building, Japan",
+    tests: ["TEST 1", "TEST 2", "TEST 3"],
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
-    check_item_no: true
+    check_item_nos: true,
+    check_tests: true
 };
 
 const SUCCESS_STACK_CACHE_NAME = "success_stack";
@@ -220,21 +228,24 @@ function App({ enqueueSnackbar, templateNames }) {
                     <TextInput
                         label="Product Name"
                         placeholder="e.g. Toy Chop 2 Piece Set"
-                        name="product_name"
-                        value={fields.product_name}
+                        name="product_names"
+                        value={fields.product_names}
                         errors={errors}
                         onChange={onChange}
+                        repeatable
                         fullWidth
                     />
                     <TextInputWithCheckbox
                         label="Item No. (Optional)"
                         placeholder="e.g. 65432"
-                        name="item_no"
-                        value={fields.item_no}
-                        checkName="check_item_no"
-                        checked={fields.check_item_no}
+                        name="item_nos"
+                        value={fields.item_nos}
+                        checkName="check_item_nos"
+                        checked={fields.check_item_nos}
                         errors={errors}
                         onChange={onChange}
+                        repeatable
+                        fullWidth
                     />
                     <DropdownInput
                         label="Country of Origin"
@@ -299,6 +310,19 @@ function App({ enqueueSnackbar, templateNames }) {
                         value={fields.buyer_address}
                         errors={errors}
                         onChange={onChange}
+                        fullWidth
+                    />
+                    <Divider />
+                    <TextInputWithCheckbox
+                        label="Test Requested (Optional)"
+                        placeholder="e.g. xxxx"
+                        name="tests"
+                        value={fields.tests}
+                        checkName="check_tests"
+                        checked={fields.check_tests}
+                        errors={errors}
+                        onChange={onChange}
+                        repeatable
                         fullWidth
                     />
                     <ErrorMsg name="general" error={errors.general} />

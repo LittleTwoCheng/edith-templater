@@ -3,8 +3,8 @@ import { withStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
-import Grid from "@material-ui/core/Grid";
 import BaseInput from "./BaseInput";
+import RepeatableInput from "./RepeatableInput";
 import ErrorMsg from "./ErrorMsg";
 
 const styles = theme => ({
@@ -24,6 +24,7 @@ export default withStyles(styles)(
         value,
         onChange,
         fullWidth = false,
+        repeatable = false,
         errors = {},
         data = null,
         placeholder = "",
@@ -38,15 +39,30 @@ export default withStyles(styles)(
             <InputLabel htmlFor={name} shrink>
                 {label}
             </InputLabel>
-            <BaseInput
-                id={name}
-                type={type}
-                name={name}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                {...rest}
-            />
+            {repeatable ? (
+                <RepeatableInput
+                    id={name}
+                    name={name}
+                    value={value}
+                    type={type}
+                    onChange={onChange}
+                    data={data}
+                    placeholder={placeholder}
+                    {...rest}
+                />
+            ) : (
+                <BaseInput
+                    id={name}
+                    type={type}
+                    name={name}
+                    value={value}
+                    onChange={event =>
+                        onChange(event, { [name]: event.target.value }, data)
+                    }
+                    placeholder={placeholder}
+                    {...rest}
+                />
+            )}
             {!!errors[name] || helperText ? (
                 <FormHelperText id={`helperText-${name}`}>
                     {!!errors[name] ? (

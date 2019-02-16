@@ -1,9 +1,4 @@
-const JSZip = require("jszip");
-const Docxtemplater = require("docxtemplater");
-
-// 🚨 TODO use this instead: https://github.com/guigrpa/docx-templates
-
-const fs = require("fs");
+const create = require("docx-templates");
 const path = require("path");
 
 const createError = require("./createError");
@@ -11,42 +6,27 @@ const uuid = require("./uuid");
 
 const compose = (templatePath, outputDir) => {
     return (fields, filePrefix = "wordTemplater-") => {
-        //Load the docx file as a binary
-        var content = fs.readFileSync(
-            //path.resolve(__dirname, `../../${templatePath}`),
-            templatePath,
-            "binary"
-        );
-
-        var zip = new JSZip(content);
-
-        var doc = new Docxtemplater();
-        doc.loadZip(zip);
-
-        //set the templateVariables
-        doc.setData(fields);
-
-        try {
-            // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
-            doc.render();
-        } catch (error) {
-            console.log(JSON.stringify({ error: e }));
-            // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
-            throw createError(`${error.name}.${error.message}`, {
-                [error.name]: error.message
-            });
-        }
-
-        var buf = doc.getZip().generate({ type: "nodebuffer" });
-
         var randomFileName = `${filePrefix}${uuid(4)}`;
         const outputPath = path.resolve(
             __dirname,
             `${outputDir}/${randomFileName}.docx`
         );
 
-        // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
-        fs.writeFileSync(outputPath, buf);
+        try {
+            // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
+
+            create({
+                template: templatePath,
+                output: outputPath,
+                data: fields
+            });
+        } catch (error) {
+            console.log("🤡", JSON.stringify({ error }));
+            // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
+            throw createError(`${error.name}.${error.message}`, {
+                [error.name]: error.message
+            });
+        }
 
         return outputPath;
     };

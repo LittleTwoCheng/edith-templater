@@ -36,14 +36,20 @@ const validateForm = composeValidate({
             minLength: 1,
             maxLength: 9999
         }),
-        product_name: SCHEMAS.STRING({
-            minLength: 1,
-            maxLength: 9999
-        }),
-        item_no: SCHEMAS.STRING({
-            minLength: 0,
-            pattern: "^[0-9A-Za-z/]*$"
-        }),
+        product_names: {
+            type: "array",
+            items: SCHEMAS.STRING({
+                minLength: 1,
+                maxLength: 9999
+            })
+        },
+        item_nos: {
+            type: "array",
+            items: SCHEMAS.STRING({
+                minLength: 0,
+                pattern: "^[0-9A-Za-z/]*$"
+            })
+        },
         country_of_origin: SCHEMAS.OPTIONS(COUNTRY_OF_ORIGINS),
         manufacturer_name: SCHEMAS.STRING({
             minLength: 1,
@@ -60,7 +66,14 @@ const validateForm = composeValidate({
         buyer_address: SCHEMAS.STRING({
             minLength: 1,
             maxLength: 9999
-        })
+        }),
+        tests: {
+            type: "array",
+            items: SCHEMAS.STRING({
+                minLength: 0,
+                maxLength: 999
+            })
+        }
     },
     required: [
         "report_no",
@@ -71,46 +84,58 @@ const validateForm = composeValidate({
         "report_delivery_date",
         "applicant_name",
         "applicant_address",
-        "product_name",
+        "product_names",
+
         "country_of_origin",
         "manufacturer_name",
         "manufacturer_address",
         "buyer_name",
-        "buyer_address"
+        "buyer_address",
+
+        "tests"
     ]
 });
 
-const toMassageCheckableWithLabel = label => (fields, name) => {
+const massageCheckable = (fields, name) => {
     const checked = fields[`check_${name}`];
-    delete fields[`check_${name}`];
 
-    if (!checked) {
-        fields[`${name}_with_label`] = "";
-        delete fields[name];
-
-        return fields;
+    if (typeof checked !== "undefined") {
+        delete fields[`check_${name}`];
+        if (!checked) {
+            fields[name] = "";
+            return fields;
+        }
     }
-
-    fields[`${name}_with_label`] = fields[name]
-        ? `${label} ${fields[name]}\n`
-        : "";
-    delete fields[name];
-    console.log("CUSTOM", { fields });
 
     return fields;
 };
 
+const massageList = (fields, name) => {
+    const checked = fields[`check_${name}`];
+
+    if (typeof checked !== "undefined") {
+        delete fields[`check_${name}`];
+        if (!checked) {
+            fields[name] = [];
+            return fields;
+        }
+    }
+
+    fields[name] = fields[name].filter(item => {
+        return item && item.length > 0;
+    });
+    return fields;
+};
+
 const formMessageMapping = {
-    labeled_age_grade: CUSTOM(
-        toMassageCheckableWithLabel("Labeled Age Grade:")
-    ),
-    age_grade: CUSTOM(toMassageCheckableWithLabel("Age Grade:")),
-    client_specified_testing_age_grade: CUSTOM(
-        toMassageCheckableWithLabel("Client Specified Testing Age Grade:")
-    ),
+    labeled_age_grade: CUSTOM(massageCheckable),
+    age_grade: CUSTOM(massageCheckable),
+    client_specified_testing_age_grade: CUSTOM(massageCheckable),
     acceptance_date: DATE(),
     report_delivery_date: DATE(),
-    item_no: CUSTOM(toMassageCheckableWithLabel("Item No.:"))
+    product_names: CUSTOM(massageList),
+    item_nos: CUSTOM(massageList),
+    tests: CUSTOM(massageList)
 };
 
 export default ({ template_name, ...fields }) => {

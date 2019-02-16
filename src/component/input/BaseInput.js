@@ -18,9 +18,7 @@ export default ({
         type={type}
         name={name}
         value={typeof value === "undefined" ? "" : value}
-        onChange={event =>
-            onChange(event, { [name]: event.target.value }, data)
-        }
+        onChange={onChange}
         aria-describedby={`helperText-${name}`}
         placeholder={placeholder}
         startAdornment={
