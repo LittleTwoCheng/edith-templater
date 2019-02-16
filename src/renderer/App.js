@@ -6,9 +6,9 @@ import uuid from "../core/uuid";
 import Page from "../component/Page";
 import Form from "../component/Form";
 import TextInput from "../component/input/Text";
+import TextInputWithCheckbox from "../component/input/TextWithCheckbox";
 import DateInput from "../component/input/Date";
 import DropdownInput from "../component/input/Dropdown";
-import Checkbox from "../component/input/Checkbox";
 import ErrorMsg from "../component/input/ErrorMsg";
 import Btn from "../component/Btn";
 import IconBtn, { ICON_ONLY } from "../component/IconBtn";
@@ -181,59 +181,39 @@ function App({ enqueueSnackbar, templateNames }) {
                         errors={errors}
                         onChange={onChange}
                     />
-                    <TextInput
+                    <TextInputWithCheckbox
                         label="Labeled Age Grade (Optional)"
                         placeholder="e.g. 6 years old and over"
                         name="labeled_age_grade"
                         value={fields.labeled_age_grade}
-                        startAdornment={
-                            <Checkbox
-                                name="check_labeled_age_grade"
-                                checked={fields.check_labeled_age_grade}
-                                onChange={onChange}
-                            />
-                        }
+                        checkName="check_labeled_age_grade"
+                        checked={fields.check_labeled_age_grade}
                         errors={errors}
                         onChange={onChange}
-                        disabled={!fields.check_labeled_age_grade}
                         fullWidth
                     />
-                    <TextInput
+                    <TextInputWithCheckbox
                         label="Age Grade (Optional)"
                         placeholder="e.g. 6 years old and over"
                         name="age_grade"
                         value={fields.age_grade}
-                        startAdornment={
-                            <Checkbox
-                                name="check_age_grade"
-                                checked={fields.check_age_grade}
-                                onChange={onChange}
-                            />
-                        }
+                        checkName="check_age_grade"
+                        checked={fields.check_age_grade}
                         errors={errors}
                         onChange={onChange}
-                        disabled={!fields.check_age_grade}
                         fullWidth
                     />
-                    <TextInput
+                    <TextInputWithCheckbox
                         label="Client Specified Testing Age Grade (Optional)"
                         placeholder="e.g. 6 years old and over"
                         name="client_specified_testing_age_grade"
                         value={fields.client_specified_testing_age_grade}
-                        startAdornment={
-                            <Checkbox
-                                name="check_client_specified_testing_age_grade"
-                                checked={
-                                    fields.check_client_specified_testing_age_grade
-                                }
-                                onChange={onChange}
-                            />
+                        checkName="check_client_specified_testing_age_grade"
+                        checked={
+                            fields.check_client_specified_testing_age_grade
                         }
                         errors={errors}
                         onChange={onChange}
-                        disabled={
-                            !fields.check_client_specified_testing_age_grade
-                        }
                         fullWidth
                     />
                     <Divider />
@@ -246,21 +226,15 @@ function App({ enqueueSnackbar, templateNames }) {
                         onChange={onChange}
                         fullWidth
                     />
-                    <TextInput
+                    <TextInputWithCheckbox
                         label="Item No. (Optional)"
                         placeholder="e.g. 65432"
                         name="item_no"
                         value={fields.item_no}
-                        startAdornment={
-                            <Checkbox
-                                name="check_item_no"
-                                checked={fields.check_item_no}
-                                onChange={onChange}
-                            />
-                        }
+                        checkName="check_item_no"
+                        checked={fields.check_item_no}
                         errors={errors}
                         onChange={onChange}
-                        disabled={!fields.check_item_no}
                     />
                     <DropdownInput
                         label="Country of Origin"
