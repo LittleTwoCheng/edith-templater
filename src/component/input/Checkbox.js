@@ -8,6 +8,5 @@ export default ({ name, checked, onChange, data = null }) => (
             onChange(event, { [name]: event.target.checked }, data)
         }
         value={name}
-        color="primary"
     />
 );

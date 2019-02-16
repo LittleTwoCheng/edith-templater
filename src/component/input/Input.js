@@ -28,7 +28,6 @@ export default withStyles(styles)(
         data = null,
         placeholder = "",
         helperText = "",
-        startAdornment = null,
         ...rest
     }) => (
         <FormControl
@@ -39,32 +38,15 @@ export default withStyles(styles)(
             <InputLabel htmlFor={name} shrink>
                 {label}
             </InputLabel>
-            {startAdornment ? (
-                <Grid container spacing={0} alignItems="flex-end">
-                    <Grid item>{startAdornment}</Grid>
-                    <Grid item>
-                        <BaseInput
-                            id={name}
-                            type={type}
-                            name={name}
-                            value={value}
-                            onChange={onChange}
-                            placeholder={placeholder}
-                            {...rest}
-                        />
-                    </Grid>
-                </Grid>
-            ) : (
-                <BaseInput
-                    id={name}
-                    type={type}
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    {...rest}
-                />
-            )}
+            <BaseInput
+                id={name}
+                type={type}
+                name={name}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                {...rest}
+            />
             {!!errors[name] || helperText ? (
                 <FormHelperText id={`helperText-${name}`}>
                     {!!errors[name] ? (
