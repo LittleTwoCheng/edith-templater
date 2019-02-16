@@ -11,8 +11,8 @@ const validateForm = composeValidate({
     properties: {
         report_no: SCHEMAS.STRING({
             minLength: 9,
-            maxLength: 11,
-            pattern: "^[0-9]{9}(-[A-Z])?$"
+            maxLength: 100,
+            pattern: "^[0-9]{9}(-[A-Z0-9,]+)*$"
         }),
         age_grade: SCHEMAS.STRING({
             minLength: 0,
