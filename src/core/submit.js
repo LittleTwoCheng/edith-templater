@@ -14,7 +14,15 @@ const validateForm = composeValidate({
             maxLength: 100,
             pattern: "^[0-9]{9}(-[A-Z0-9,]+)*$"
         }),
+        labeled_age_grade: SCHEMAS.STRING({
+            minLength: 0,
+            maxLength: 100
+        }),
         age_grade: SCHEMAS.STRING({
+            minLength: 0,
+            maxLength: 100
+        }),
+        client_specified_testing_age_grade: SCHEMAS.STRING({
             minLength: 0,
             maxLength: 100
         }),
@@ -56,7 +64,9 @@ const validateForm = composeValidate({
     },
     required: [
         "report_no",
+        "labeled_age_grade",
         "age_grade",
+        "client_specified_testing_age_grade",
         "acceptance_date",
         "report_delivery_date",
         "applicant_name",
@@ -70,18 +80,37 @@ const validateForm = composeValidate({
     ]
 });
 
-const formMessageMapping = {
-    age_grade: CUSTOM((fields, name) => {
-        fields[`${name}_with_label`] = fields[name]
-            ? `Age Grade: ${fields[name]}`
-            : "";
+const toMassageCheckableWithLabel = label => (fields, name) => {
+    const checked = fields[`check_${name}`];
+    delete fields[`check_${name}`];
+
+    if (!checked) {
+        fields[`${name}_with_label`] = "";
         delete fields[name];
-        console.log("CUSTOM", { fields });
+
         return fields;
-    }),
+    }
+
+    fields[`${name}_with_label`] = fields[name]
+        ? `${label} ${fields[name]}\n`
+        : "";
+    delete fields[name];
+    console.log("CUSTOM", { fields });
+
+    return fields;
+};
+
+const formMessageMapping = {
+    labeled_age_grade: CUSTOM(
+        toMassageCheckableWithLabel("Labeled Age Grade:")
+    ),
+    age_grade: CUSTOM(toMassageCheckableWithLabel("Age Grade:")),
+    client_specified_testing_age_grade: CUSTOM(
+        toMassageCheckableWithLabel("Client Specified Testing Age Grade:")
+    ),
     acceptance_date: DATE(),
     report_delivery_date: DATE(),
-    item_no: EMPTY_TO("N/A")
+    item_no: CUSTOM(toMassageCheckableWithLabel("Item No.:"))
 };
 
 export default ({ template_name, ...fields }) => {

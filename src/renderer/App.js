@@ -8,8 +8,8 @@ import Form from "../component/Form";
 import TextInput from "../component/input/Text";
 import DateInput from "../component/input/Date";
 import DropdownInput from "../component/input/Dropdown";
+import Checkbox from "../component/input/Checkbox";
 import ErrorMsg from "../component/input/ErrorMsg";
-import Actions from "../component/Actions";
 import Btn from "../component/Btn";
 import IconBtn, { ICON_ONLY } from "../component/IconBtn";
 import Divider from "../component/Divider";
@@ -34,7 +34,9 @@ const DEFAULT_FIELDS = {
     report_no: "",
     acceptance_date: TODAY_DATE,
     report_delivery_date: TODAY_DATE,
+    labeled_age_grade: "",
     age_grade: "",
+    client_specified_testing_age_grade: "",
     applicant_name: "",
     applicant_address: "",
     product_name: "",
@@ -43,13 +45,19 @@ const DEFAULT_FIELDS = {
     manufacturer_name: "",
     manufacturer_address: "",
     buyer_name: "",
-    buyer_address: ""
+    buyer_address: "",
+    check_labeled_age_grade: true,
+    check_age_grade: true,
+    check_client_specified_testing_age_grade: true,
+    check_item_no: true
 };
 const TEST_FIELDS = {
-    report_no: "123456789-T",
+    report_no: "123456789-S1,2-R",
     acceptance_date: "2019-02-08",
     report_delivery_date: "2019-03-31",
+    labeled_age_grade: "6 years old and over",
     age_grade: "6 years old and over",
+    client_specified_testing_age_grade: "6 years old and over",
     applicant_name: "John, Applicant Ho",
     applicant_address: "Applicant Building, Tin Shui Wai",
     product_name: "Pokemon Toy",
@@ -58,7 +66,11 @@ const TEST_FIELDS = {
     manufacturer_name: "Man Lee",
     manufacturer_address: "Manufacturer Building, China",
     buyer_name: "Buyer Tom",
-    buyer_address: "Buyer Building, Japan"
+    buyer_address: "Buyer Building, Japan",
+    check_labeled_age_grade: true,
+    check_age_grade: true,
+    check_client_specified_testing_age_grade: true,
+    check_item_no: true
 };
 
 const SUCCESS_STACK_CACHE_NAME = "success_stack";
@@ -153,14 +165,7 @@ function App({ enqueueSnackbar, templateNames }) {
                         value={fields.report_no}
                         errors={errors}
                         onChange={onChange}
-                    />
-                    <TextInput
-                        label="Age Grade (Optional)"
-                        placeholder="e.g. 6 years old and over"
-                        name="age_grade"
-                        value={fields.age_grade}
-                        errors={errors}
-                        onChange={onChange}
+                        fullWidth
                     />
                     <DateInput
                         label="Acceptance Date"
@@ -175,6 +180,61 @@ function App({ enqueueSnackbar, templateNames }) {
                         value={fields.report_delivery_date}
                         errors={errors}
                         onChange={onChange}
+                    />
+                    <TextInput
+                        label="Labeled Age Grade (Optional)"
+                        placeholder="e.g. 6 years old and over"
+                        name="labeled_age_grade"
+                        value={fields.labeled_age_grade}
+                        startAdornment={
+                            <Checkbox
+                                name="check_labeled_age_grade"
+                                checked={fields.check_labeled_age_grade}
+                                onChange={onChange}
+                            />
+                        }
+                        errors={errors}
+                        onChange={onChange}
+                        disabled={!fields.check_labeled_age_grade}
+                        fullWidth
+                    />
+                    <TextInput
+                        label="Age Grade (Optional)"
+                        placeholder="e.g. 6 years old and over"
+                        name="age_grade"
+                        value={fields.age_grade}
+                        startAdornment={
+                            <Checkbox
+                                name="check_age_grade"
+                                checked={fields.check_age_grade}
+                                onChange={onChange}
+                            />
+                        }
+                        errors={errors}
+                        onChange={onChange}
+                        disabled={!fields.check_age_grade}
+                        fullWidth
+                    />
+                    <TextInput
+                        label="Client Specified Testing Age Grade (Optional)"
+                        placeholder="e.g. 6 years old and over"
+                        name="client_specified_testing_age_grade"
+                        value={fields.client_specified_testing_age_grade}
+                        startAdornment={
+                            <Checkbox
+                                name="check_client_specified_testing_age_grade"
+                                checked={
+                                    fields.check_client_specified_testing_age_grade
+                                }
+                                onChange={onChange}
+                            />
+                        }
+                        errors={errors}
+                        onChange={onChange}
+                        disabled={
+                            !fields.check_client_specified_testing_age_grade
+                        }
+                        fullWidth
                     />
                     <Divider />
                     <TextInput
@@ -191,8 +251,16 @@ function App({ enqueueSnackbar, templateNames }) {
                         placeholder="e.g. 65432"
                         name="item_no"
                         value={fields.item_no}
+                        startAdornment={
+                            <Checkbox
+                                name="check_item_no"
+                                checked={fields.check_item_no}
+                                onChange={onChange}
+                            />
+                        }
                         errors={errors}
                         onChange={onChange}
+                        disabled={!fields.check_item_no}
                     />
                     <DropdownInput
                         label="Country of Origin"
