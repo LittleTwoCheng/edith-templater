@@ -1,9 +1,10 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
+import Grid from "@material-ui/core/Grid";
+import BaseInput from "./BaseInput";
 import ErrorMsg from "./ErrorMsg";
 
 const styles = theme => ({
@@ -27,6 +28,7 @@ export default withStyles(styles)(
         data = null,
         placeholder = "",
         helperText = "",
+        startAdornment = null,
         ...rest
     }) => (
         <FormControl
@@ -37,18 +39,32 @@ export default withStyles(styles)(
             <InputLabel htmlFor={name} shrink>
                 {label}
             </InputLabel>
-            <Input
-                id={name}
-                type={type}
-                name={name}
-                value={typeof value === "undefined" ? "" : value}
-                onChange={event =>
-                    onChange(event, { [name]: event.target.value }, data)
-                }
-                aria-describedby={`helperText-${name}`}
-                placeholder={placeholder}
-                {...rest}
-            />
+            {startAdornment ? (
+                <Grid container spacing={0} alignItems="flex-end">
+                    <Grid item>{startAdornment}</Grid>
+                    <Grid item>
+                        <BaseInput
+                            id={name}
+                            type={type}
+                            name={name}
+                            value={value}
+                            onChange={onChange}
+                            placeholder={placeholder}
+                            {...rest}
+                        />
+                    </Grid>
+                </Grid>
+            ) : (
+                <BaseInput
+                    id={name}
+                    type={type}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    {...rest}
+                />
+            )}
             {!!errors[name] || helperText ? (
                 <FormHelperText id={`helperText-${name}`}>
                     {!!errors[name] ? (
