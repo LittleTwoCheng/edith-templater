@@ -245,7 +245,6 @@ function App({ enqueueSnackbar, templateNames }) {
                         errors={errors}
                         onChange={onChange}
                         repeatable
-                        fullWidth
                     />
                     <DropdownInput
                         label="Country of Origin"
