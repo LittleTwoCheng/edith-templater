@@ -24,6 +24,7 @@ export default withStyles(styles)(
         value,
         type,
         onChange,
+        disabled = false,
         data = null,
         placeholder = "",
         ...rest
@@ -62,6 +63,7 @@ export default withStyles(styles)(
                         }
                     }}
                     placeholder={placeholder}
+                    disabled={disabled}
                     {...rest}
                 />
                 <div className={classes.chips}>
@@ -70,15 +72,19 @@ export default withStyles(styles)(
                             <Chip
                                 key={`${val}-${idx}`}
                                 label={val}
-                                onDelete={() => {
-                                    let mutatedVal = [...value];
-                                    mutatedVal.splice(idx, 1);
-                                    onChange(
-                                        null,
-                                        { [name]: mutatedVal },
-                                        data
-                                    );
-                                }}
+                                onDelete={
+                                    disabled
+                                        ? null
+                                        : () => {
+                                              let mutatedVal = [...value];
+                                              mutatedVal.splice(idx, 1);
+                                              onChange(
+                                                  null,
+                                                  { [name]: mutatedVal },
+                                                  data
+                                              );
+                                          }
+                                }
                                 className={classes.chip}
                             />
                         ) : null
