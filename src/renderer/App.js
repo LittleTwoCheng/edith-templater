@@ -357,10 +357,10 @@ function App({ enqueueSnackbar, templateNames }) {
                     </IconBtn>
                 </Form>
             </Page>
-            {successStack.length ? (
-                <Page elevation={4}>
-                    <Typography align="center" variant="h5" component="h1">
-                        Latest Downloads{" "}
+            <Page elevation={4}>
+                <Typography align="center" variant="h5" component="h1">
+                    Latest Downloads{" "}
+                    {successStack.length ? (
                         <IconBtn
                             title="Clean up the list"
                             variant="text"
@@ -368,8 +368,10 @@ function App({ enqueueSnackbar, templateNames }) {
                             iconPosition={ICON_ONLY}
                             onClick={onRemoveStack}
                         />
-                    </Typography>
-                    {successStack.map(success => (
+                    ) : null}
+                </Typography>
+                {successStack.length ? (
+                    successStack.map(success => (
                         <Slide
                             key={success.id}
                             direction="left"
@@ -392,9 +394,19 @@ function App({ enqueueSnackbar, templateNames }) {
                                 )}
                             />
                         </Slide>
-                    ))}
-                </Page>
-            ) : null}
+                    ))
+                ) : (
+                    <Typography
+                        align="center"
+                        variant="body2"
+                        component="div"
+                        fontWeight="fontWeightLight"
+                        color="textSecondary"
+                    >
+                        No Records at this moment...
+                    </Typography>
+                )}
+            </Page>
         </Fragment>
     );
 }
