@@ -16,7 +16,7 @@ tv4.setErrorReporter(function(error, data, schema) {
 });
 
 const extractFieldName = dataPath => {
-    return dataPath.replace("/", "");
+    return dataPath.replace(/(\/[0-9]*)/g, "");
 };
 const escapeRegExp = string => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
