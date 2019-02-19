@@ -163,7 +163,15 @@ function App({ enqueueSnackbar, templateNames }) {
         <Fragment>
             <Page>
                 <Typography align="center" variant="h5" component="h1">
-                    MGSL (HK) Template Generator
+                    Edith Templater
+                </Typography>
+                <Typography
+                    align="center"
+                    variant="h6"
+                    component="h2"
+                    color="textSecondary"
+                >
+                    A tool to generate Docx file
                 </Typography>
                 <Form onSubmit={onSubmit}>
                     <TextInput
