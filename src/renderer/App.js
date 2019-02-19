@@ -85,7 +85,11 @@ const SUCCESS_STACK_CACHE_NAME = "success_stack";
 const INITIAL_SUCCESS_STACK = getCache(SUCCESS_STACK_CACHE_NAME, []);
 const MAX_SUCCESS_STACK_OFFSET = 10;
 
-function App({ enqueueSnackbar, templateNames }) {
+function App({ enqueueSnackbar, settings }) {
+    const [settingName, setSettingName] = useState("default");
+    const setting = settings[settingName];
+    const { templateNames } = setting;
+
     const [fields, setFields] = useState({
         ...DEFAULT_FIELDS,
         template_name: templateNames[0]
@@ -163,7 +167,7 @@ function App({ enqueueSnackbar, templateNames }) {
         <Fragment>
             <Page>
                 <Typography align="center" variant="h5" component="h1">
-                    Edith Templater
+                    {setting.headline || "Edith Templater"}
                 </Typography>
                 <Typography
                     align="center"
@@ -171,7 +175,7 @@ function App({ enqueueSnackbar, templateNames }) {
                     component="h2"
                     color="textSecondary"
                 >
-                    A tool to generate Docx file
+                    {setting.subHeadline || "A tool to generate Docx file"}
                 </Typography>
                 <Form onSubmit={onSubmit}>
                     <TextInput
