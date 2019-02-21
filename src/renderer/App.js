@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useMemo } from "react";
 import submit from "../core/submit";
 import fnsFormat from "date-fns/format";
 import uuid from "../core/uuid";
@@ -13,21 +13,20 @@ import ErrorMsg from "../component/input/ErrorMsg";
 import Btn from "../component/Btn";
 import IconBtn, { ICON_ONLY } from "../component/IconBtn";
 import Divider from "../component/Divider";
+import SettingMenu from "../component/SettingMenu";
 import FileLink from "../component/electron/FileLink";
 
 import Typography from "@material-ui/core/Typography";
 import DoneIcon from "@material-ui/icons/Done";
 import SearchIcon from "@material-ui/icons/Search";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 import Slide from "@material-ui/core/Slide";
+import Chip from "@material-ui/core/Chip";
 
 import { withSnackbar } from "notistack";
 
 import { get as getCache, set as setCache } from "../core/cache";
-
-import COUNTRY_OF_ORIGINS, {
-    options as COUNTRY_OF_ORIGIN_OPTIONS
-} from "../constant/countryOfOrigin";
 
 const TODAY_DATE = fnsFormat(new Date(), "YYYY-MM-DD");
 const DEFAULT_FIELDS = {
@@ -53,7 +52,7 @@ const DEFAULT_FIELDS = {
     check_item_nos: true,
     check_tests: true
 };
-const TEST_FIELDS = {
+const getTestFields = dataSet => ({
     report_no: "123456789-S1,2-R",
     acceptance_date: "2019-02-08",
     report_delivery_date: "2019-03-31",
@@ -68,7 +67,7 @@ const TEST_FIELDS = {
         "Pokemon Toy(Green)"
     ],
     item_nos: ["654321", "765432"],
-    country_of_origin: COUNTRY_OF_ORIGINS[0],
+    country_of_origin: dataSet.country[0].country_of_origin,
     manufacturer_name: "Man Lee",
     manufacturer_address: "Manufacturer Building, China",
     buyer_name: "Buyer Tom",
@@ -79,16 +78,47 @@ const TEST_FIELDS = {
     check_client_specified_testing_age_grade: true,
     check_item_nos: true,
     check_tests: true
-};
+});
 
 const SUCCESS_STACK_CACHE_NAME = "success_stack";
 const INITIAL_SUCCESS_STACK = getCache(SUCCESS_STACK_CACHE_NAME, []);
 const MAX_SUCCESS_STACK_OFFSET = 10;
 
-function App({ enqueueSnackbar, settings }) {
-    const [settingName, setSettingName] = useState("default");
+const getInitialSettingName = (settings, defaultName) => {
+    const names = Object.keys(settings);
+    if (names.indexOf(defaultName) !== -1) return defaultName;
+    return names[0];
+};
+
+function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
+    const countryOfOriginOptions = useMemo(
+        () =>
+            dataSet.country.reduce((options, country) => {
+                const name = country.country_of_origin;
+                options[name] = name;
+                return options;
+            }, {}),
+        [dataSet]
+    );
+    const testRequestedAutoComplete = useMemo(
+        () => ({
+            suggestions: dataSet.test.map(test => ({
+                label: test.test_name,
+                tags: [test.division]
+            }))
+        }),
+        [dataSet]
+    );
+
+    const [settingName, setSettingName] = useState(
+        getInitialSettingName(settings, "default")
+    );
     const setting = settings[settingName];
     const { templateNames } = setting;
+
+    const [settingMenuAnchorElement, setSettingMenuAnchorElement] = useState(
+        null
+    );
 
     const [fields, setFields] = useState({
         ...DEFAULT_FIELDS,
@@ -97,15 +127,15 @@ function App({ enqueueSnackbar, settings }) {
     const [errors, setErrors] = useState({});
     const [isLoading, setLoading] = useState(false);
     const [successStack, setSuccessStack] = useState(INITIAL_SUCCESS_STACK);
-    console.log("render", { fields });
+    console.log("render", { fields, dataSet });
+
     const onSubmit = event => {
-        console.log("submit");
         event.stopPropagation();
         event.preventDefault();
 
         setLoading(true);
         try {
-            const filePath = submit(fields);
+            const filePath = submit({ settingName, ...fields });
 
             setLoading(false);
             setErrors({});
@@ -158,8 +188,7 @@ function App({ enqueueSnackbar, settings }) {
         setSuccessStack(EMPTY);
     };
     const onTestClick = () => {
-        console.log("TestClick");
-        setFields({ ...fields, ...TEST_FIELDS });
+        setFields({ ...fields, ...getTestFields(dataSet) });
     };
     console.log("App.render");
 
@@ -177,6 +206,27 @@ function App({ enqueueSnackbar, settings }) {
                 >
                     {setting.subHeadline || "A tool to generate Docx file"}
                 </Typography>
+                <div style={{ position: "absolute", top: 5, right: 5 }}>
+                    <IconBtn
+                        variant="text"
+                        type="button"
+                        Icon={EditIcon}
+                        iconPosition={ICON_ONLY}
+                        title="Change Setting Profile"
+                        onClick={event =>
+                            setSettingMenuAnchorElement(event.currentTarget)
+                        }
+                    />
+                </div>
+                <SettingMenu
+                    anchorElement={settingMenuAnchorElement}
+                    onClose={() => setSettingMenuAnchorElement(null)}
+                    onChange={settingName => {
+                        setSettingName(settingName);
+                        setSettingMenuAnchorElement(null);
+                    }}
+                    settings={settings}
+                />
                 <Form onSubmit={onSubmit}>
                     <TextInput
                         label="Report No."
@@ -262,7 +312,7 @@ function App({ enqueueSnackbar, settings }) {
                         label="Country of Origin"
                         name="country_of_origin"
                         value={fields.country_of_origin}
-                        options={COUNTRY_OF_ORIGIN_OPTIONS}
+                        options={countryOfOriginOptions}
                         errors={errors}
                         onChange={onChange}
                     />
@@ -333,6 +383,7 @@ function App({ enqueueSnackbar, settings }) {
                         checked={fields.check_tests}
                         errors={errors}
                         onChange={onChange}
+                        autoComplete={testRequestedAutoComplete}
                         repeatable
                         fullWidth
                     />

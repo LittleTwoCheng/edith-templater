@@ -5,6 +5,7 @@ import * as path from "path";
 import { format as formatUrl } from "url";
 import getAppSettings from "./getAppSettings";
 import getTemplateNames from "./getTemplateNames";
+import getDataSetAsync from "./getDataSetAsync";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -65,12 +66,19 @@ app.on("activate", () => {
   }
 });
 
+const dataSetPromise = getDataSetAsync(__static);
+
 // create main BrowserWindow when electron is ready
 app.on("ready", () => {
   mainWindow = createMainWindow();
   mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow.webContents.send("appDataLoaded", {
-      settings: getAppSettings(__static, getTemplateNames)
+    dataSetPromise.then(dataSet => {
+      const appData = {
+        settings: getAppSettings(__static, getTemplateNames),
+        dataSet
+      };
+
+      mainWindow.webContents.send("appDataLoaded", appData);
     });
   });
 });

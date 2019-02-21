@@ -1,3 +1,10 @@
 import React from "react";
 import Input from "./Input";
-export default ({ ...props }) => <Input {...props} type="text" />;
+import AutoComplete from "./AutoComplete";
+
+export default ({ autoComplete = null, ...props }) =>
+    autoComplete ? (
+        <AutoComplete autoComplete={autoComplete} {...props} />
+    ) : (
+        <Input {...props} type="text" />
+    );

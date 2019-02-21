@@ -7,11 +7,11 @@ import SnackbarProvider from "./SnackbarProvider";
 
 import THEME from "./theme";
 
-require("electron").ipcRenderer.on("appDataLoaded", (event, { settings }) => {
+require("electron").ipcRenderer.on("appDataLoaded", (event, appData) => {
     render(
         <StyleProvider theme={THEME}>
             <SnackbarProvider>
-                <App settings={settings} />
+                <App appData={appData} />
             </SnackbarProvider>
         </StyleProvider>,
         document.getElementById("app")

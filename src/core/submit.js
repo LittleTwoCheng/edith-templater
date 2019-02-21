@@ -2,7 +2,6 @@ import { compose } from "./createTemplate";
 import messageFields, { DATE, EMPTY_TO, CUSTOM } from "./messageFields";
 
 import { compose as composeValidate, SCHEMAS } from "../form/validate";
-import COUNTRY_OF_ORIGINS from "../constant/countryOfOrigin";
 
 import { remote } from "electron";
 const { app } = remote;
@@ -50,7 +49,10 @@ const validateForm = composeValidate({
                 pattern: "^[0-9A-Za-z/]*$"
             })
         },
-        country_of_origin: SCHEMAS.OPTIONS(COUNTRY_OF_ORIGINS),
+        country_of_origin: SCHEMAS.STRING({
+            minLength: 1,
+            maxLength: 999
+        }),
         manufacturer_name: SCHEMAS.STRING({
             minLength: 1,
             maxLength: 999
@@ -138,16 +140,16 @@ const formMessageMapping = {
     tests: CUSTOM(massageList)
 };
 
-export default ({ template_name, ...fields }) => {
+export default ({ settingName, template_name, ...fields }) => {
     console.log("submit", {
         fields,
         template_name,
-        path: __static + `/${template_name}`
+        path: __static + `/${settingName}/templates/${template_name}`
     });
     validateForm(fields);
 
     const createTemplate = compose(
-        __static + `/${template_name}`,
+        __static + `/${settingName}/templates/${template_name}`,
         app.getPath("downloads")
     );
     return createTemplate(
