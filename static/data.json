@@ -1,0 +1,26 @@
+[
+    {
+        "name": "test",
+        "path": "report_test.xlsx",
+        "schema": {
+            "Test name": {
+                "prop": "test_name",
+                "required": true
+            },
+            "Division": {
+                "prop": "division",
+                "required": true
+            }
+        }
+    },
+    {
+        "name": "country",
+        "path": "country.xlsx",
+        "schema": {
+            "Country Of Origin": {
+                "prop": "country_of_origin",
+                "required": true
+            }
+        }
+    }
+]

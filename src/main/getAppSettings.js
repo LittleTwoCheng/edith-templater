@@ -1,4 +1,5 @@
-const { lstatSync, readdirSync, readFileSync } = require("fs");
+const readJson = require("./readJson").default;
+const { lstatSync, readdirSync } = require("fs");
 const path = require("path");
 const { join } = path;
 
@@ -10,9 +11,7 @@ export default function getAppSettings(dirPath, getTemplateNames) {
     const settingNames = allDir(dirPath);
 
     return settingNames.reduce((merged, settingName) => {
-        const setting = JSON.parse(
-            readFileSync(join(dirPath, settingName, "setting.json"), "utf8")
-        );
+        const setting = readJson(join(dirPath, settingName, "setting.json"));
 
         merged[settingName] = {
             ...setting,
