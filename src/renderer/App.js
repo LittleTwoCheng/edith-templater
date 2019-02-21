@@ -38,7 +38,7 @@ const DEFAULT_FIELDS = {
     client_specified_testing_age_grade: "",
     applicant_name: "",
     applicant_address: "",
-    product_names: [""],
+    product_names: [],
     item_nos: [],
     country_of_origin: "",
     manufacturer_name: "",
