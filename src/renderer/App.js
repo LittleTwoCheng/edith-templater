@@ -25,6 +25,7 @@ import DoneIcon from "@material-ui/icons/Done";
 import SearchIcon from "@material-ui/icons/Search";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import PublishIcon from "@material-ui/icons/Publish";
 import Slide from "@material-ui/core/Slide";
 
 import { withSnackbar } from "notistack";
@@ -179,7 +180,12 @@ const syncCheckableState = (name, syncTargets) => {
     };
 };
 
-function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
+function App({
+    enqueueSnackbar,
+    appData: { settings, dataSet },
+    store,
+    dispatch
+}) {
     const countryOfOriginOptions = useMemo(
         () =>
             dataSet.country.reduce((options, country) => {
@@ -242,6 +248,7 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                 {
                     id: uuid(),
                     time: fnsFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
+                    fields,
                     filePath
                 }
             ].concat(successStack);
@@ -287,6 +294,10 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
         setCache(SUCCESS_STACK_CACHE_NAME, EMPTY);
         setSuccessStack(EMPTY);
     };
+    const onReloadFields = reloadedFields => {
+        setFields({ ...reloadedFields });
+    };
+
     const onTestClick = () => {
         setFields({ ...fields, ...getTestFields(dataSet) });
     };
@@ -745,15 +756,31 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                             <FileLink
                                 time={success.time}
                                 path={success.filePath}
-                                renderButton={({ onClick }) => (
-                                    <IconBtn
-                                        variant="text"
-                                        Icon={SearchIcon}
-                                        onClick={onClick}
-                                        fullWidth
-                                    >
-                                        Open Document
-                                    </IconBtn>
+                                dispatch={dispatch}
+                                renderActions={({ onOpenDoc }) => (
+                                    <Fragment>
+                                        <IconBtn
+                                            variant="text"
+                                            Icon={SearchIcon}
+                                            onClick={onOpenDoc}
+                                            fullWidth={!success.fields}
+                                        >
+                                            Open Document
+                                        </IconBtn>
+                                        {success.fields ? (
+                                            <IconBtn
+                                                variant="text"
+                                                Icon={PublishIcon}
+                                                onClick={() => {
+                                                    onReloadFields(
+                                                        success.fields
+                                                    );
+                                                }}
+                                            >
+                                                Reload Fields
+                                            </IconBtn>
+                                        ) : null}
+                                    </Fragment>
                                 )}
                             />
                         </Slide>

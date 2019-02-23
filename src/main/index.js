@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import * as path from "path";
 import { format as formatUrl } from "url";
 import getAppSettings from "./getAppSettings";
@@ -69,7 +69,34 @@ app.on("activate", () => {
   }
 });
 
+let store = {};
+let appData = null;
 const dataSetPromise = getDataSetAsync(__static);
+
+function onAppEvent(event, action) {
+  // console.log("💥onAppEvent", { action });
+  const mutatedStore = reduceActions(store, action);
+  if (mutatedStore) {
+    mainWindow.webContents.send("storeUpdated", {
+      appData,
+      store: {
+        ...store,
+        ...mutatedStore
+      }
+    });
+  }
+}
+
+function reduceActions(store, { type, payload }) {
+  switch (type) {
+    case "document.open":
+      shell.openItem(payload.path);
+      return null;
+
+    default:
+    //do nothing
+  }
+}
 
 // create main BrowserWindow when electron is ready
 app.on("ready", () => {
@@ -82,12 +109,13 @@ app.on("ready", () => {
   }
   mainWindow.webContents.on("did-finish-load", () => {
     dataSetPromise.then(dataSet => {
-      const appData = {
+      appData = {
         settings: getAppSettings(__static, getTemplateNames),
         dataSet
       };
 
-      mainWindow.webContents.send("appDataLoaded", appData);
+      ipcMain.on("appEvent", onAppEvent);
+      mainWindow.webContents.send("appUpdated", { appData, store });
     });
   });
 });

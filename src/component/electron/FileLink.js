@@ -1,4 +1,3 @@
-import { shell } from "electron";
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -18,37 +17,44 @@ const styles = theme => ({
         minWidth: 150
     },
     btn: {
-        minWidth: 200
+        minWidth: 200,
+        textAlign: "center"
     }
 });
 
-export default withStyles(styles)(({ classes, path, time, renderButton }) => {
-    const onClick = () => {
-        console.log("click", { path });
-        shell.openItem(path);
-    };
-    return (
-        <div className={classes.root}>
-            <Grid container spacing={8} justify="center" alignItems="center">
-                <Grid item xs>
-                    <Grid
-                        container
-                        spacing={8}
-                        justify="center"
-                        alignItems="center"
-                    >
-                        <Grid item xs className={classes.label}>
-                            {path}
-                        </Grid>
-                        <Grid item xs className={classes.time}>
-                            {time}
+export default withStyles(styles)(
+    ({ classes, path, time, dispatch, renderActions }) => {
+        const onOpenDoc = () =>
+            dispatch({ type: "document.open", payload: { path } });
+
+        return (
+            <div className={classes.root}>
+                <Grid
+                    container
+                    spacing={8}
+                    justify="center"
+                    alignItems="center"
+                >
+                    <Grid item xs>
+                        <Grid
+                            container
+                            spacing={8}
+                            justify="center"
+                            alignItems="center"
+                        >
+                            <Grid item xs className={classes.label}>
+                                {path}
+                            </Grid>
+                            <Grid item xs className={classes.time}>
+                                {time}
+                            </Grid>
                         </Grid>
                     </Grid>
+                    <Grid className={classes.btn} item xs>
+                        {renderActions({ onOpenDoc })}
+                    </Grid>
                 </Grid>
-                <Grid className={classes.btn} item xs>
-                    {renderButton({ onClick })}
-                </Grid>
-            </Grid>
-        </div>
-    );
-});
+            </div>
+        );
+    }
+);
