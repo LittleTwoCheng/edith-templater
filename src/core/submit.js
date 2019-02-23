@@ -1,4 +1,4 @@
-import { compose } from "./createTemplate";
+import createTemplate from "./createTemplate";
 import messageFields, { DATE, CUSTOM } from "./messageFields";
 
 import { compose as composeValidate, SCHEMAS } from "../form/validate";
@@ -150,12 +150,10 @@ export default ({ settingName, template_name, ...fields }) => {
     });
     validateForm(fields);
 
-    const createTemplate = compose(
-        __static + `/${settingName}/templates/${template_name}`,
-        app.getPath("downloads")
-    );
     return createTemplate(
         messageFields(fields, formMessageMapping),
+        app.getPath("downloads"),
+        __static + `/${settingName}/templates/${template_name}`,
         `Report_${fields.report_no}_`
     );
 };
