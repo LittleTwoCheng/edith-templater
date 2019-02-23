@@ -1,5 +1,5 @@
 import { compose } from "./createTemplate";
-import messageFields, { DATE, EMPTY_TO, CUSTOM } from "./messageFields";
+import messageFields, { DATE, CUSTOM } from "./messageFields";
 
 import { compose as composeValidate, SCHEMAS } from "../form/validate";
 
@@ -14,15 +14,15 @@ const validateForm = composeValidate({
             pattern: "^[0-9]{9}(-[A-Z0-9,]+)*$"
         }),
         labeled_age_grade: SCHEMAS.STRING({
-            minLength: 0,
+            minLength: 1,
             maxLength: 100
         }),
         age_grade: SCHEMAS.STRING({
-            minLength: 0,
+            minLength: 1,
             maxLength: 100
         }),
         client_specified_testing_age_grade: SCHEMAS.STRING({
-            minLength: 0,
+            minLength: 1,
             maxLength: 100
         }),
         acceptance_date: SCHEMAS.DATE(),
@@ -37,6 +37,7 @@ const validateForm = composeValidate({
         }),
         product_names: {
             type: "array",
+            minItems: 1,
             items: SCHEMAS.STRING({
                 minLength: 1,
                 maxLength: 9999
@@ -44,8 +45,9 @@ const validateForm = composeValidate({
         },
         item_nos: {
             type: "array",
+            minItems: 1,
             items: SCHEMAS.STRING({
-                minLength: 0,
+                minLength: 1,
                 pattern: "^[0-9A-Za-z/]*$"
             })
         },
@@ -71,56 +73,38 @@ const validateForm = composeValidate({
         }),
         tests: {
             type: "array",
+            minItems: 1,
             items: SCHEMAS.STRING({
-                minLength: 0,
+                minLength: 1,
                 maxLength: 999
             })
         }
     },
-    required: [
-        "report_no",
+    optional: [
         "labeled_age_grade",
         "age_grade",
         "client_specified_testing_age_grade",
+        "item_nos",
+        "tests"
+    ],
+    required: [
+        "report_no",
         "acceptance_date",
         "report_delivery_date",
         "applicant_name",
         "applicant_address",
         "product_names",
-
         "country_of_origin",
         "manufacturer_name",
         "manufacturer_address",
         "buyer_name",
-        "buyer_address",
-
-        "tests"
+        "buyer_address"
     ]
 });
 
-const massageCheckable = (fields, name) => {
-    const checked = fields[`check_${name}`];
-
-    if (typeof checked !== "undefined") {
-        delete fields[`check_${name}`];
-        if (!checked) {
-            fields[name] = "";
-            return fields;
-        }
-    }
-
-    return fields;
-};
-
 const massageList = (fields, name) => {
-    const checked = fields[`check_${name}`];
-
-    if (typeof checked !== "undefined") {
-        delete fields[`check_${name}`];
-        if (!checked) {
-            fields[name] = [];
-            return fields;
-        }
+    if (!fields[name] || !fields[name].length) {
+        return fields;
     }
 
     fields[name] = fields[name].filter(item => {
@@ -130,9 +114,6 @@ const massageList = (fields, name) => {
 };
 
 const formMessageMapping = {
-    labeled_age_grade: CUSTOM(massageCheckable),
-    age_grade: CUSTOM(massageCheckable),
-    client_specified_testing_age_grade: CUSTOM(massageCheckable),
     acceptance_date: DATE(),
     report_delivery_date: DATE(),
     product_names: CUSTOM(massageList),

@@ -9,7 +9,10 @@ tv4.setErrorReporter(function(error, data, schema) {
             if (!error.params.length) return `Required.`;
 
             return error.message;
+        case tv4.errorCodes.ARRAY_LENGTH_SHORT:
+            if (!error.params.length) return `Required.`;
 
+            return error.message;
         default:
             return error.message;
     }
@@ -21,10 +24,51 @@ const extractFieldName = dataPath => {
 const escapeRegExp = string => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 };
+const mutateOptionals = (schema, fields) => {
+    if (!schema.optional || !schema.optional.length)
+        return {
+            schema,
+            fields
+        };
+    const mutatedSchema = { ...schema };
+    const mutatedFields = { ...fields };
+
+    mutatedSchema.required = [...schema.required];
+    schema.optional.forEach(name => {
+        const checked = mutatedFields[`check_${name}`];
+        if (typeof checked !== "undefined") {
+            delete mutatedFields[`check_${name}`];
+            if (checked) {
+                mutatedSchema.required.push(name);
+            } else {
+                delete mutatedFields[name];
+            }
+        }
+    });
+
+    delete mutatedSchema.optional;
+
+    return {
+        fields: mutatedFields,
+        schema: mutatedSchema
+    };
+};
+
 export const compose = schema => {
     return fields => {
-        var result = tv4.validateMultiple(fields, schema);
-        console.log("Validation", { fields, schema, result });
+        const {
+            fields: mutatedFields,
+            schema: mutatedSchema
+        } = mutateOptionals(schema, fields);
+
+        var result = tv4.validateMultiple(mutatedFields, mutatedSchema);
+        // console.log("✅ Validation", {
+        //     fields,
+        //     mutatedFields,
+        //     schema,
+        //     mutatedSchema,
+        //     result
+        // });
 
         if (!result.valid)
             throw createError(
