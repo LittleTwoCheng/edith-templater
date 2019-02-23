@@ -78,6 +78,9 @@ const validateForm = composeValidate({
                 minLength: 1,
                 maxLength: 999
             })
+        },
+        is_retest: {
+            type: "boolean"
         }
     },
     optional: [
@@ -98,7 +101,8 @@ const validateForm = composeValidate({
         "manufacturer_name",
         "manufacturer_address",
         "buyer_name",
-        "buyer_address"
+        "buyer_address",
+        "is_retest"
     ]
 });
 

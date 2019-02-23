@@ -10,6 +10,7 @@ import TextInput from "../component/input/Text";
 import TextInputWithCheckbox from "../component/input/TextWithCheckbox";
 import DateInput from "../component/input/Date";
 import DropdownInput from "../component/input/Dropdown";
+import BooleanInput from "../component/input/Boolean";
 import ErrorMsg from "../component/input/ErrorMsg";
 import Btn from "../component/Btn";
 import IconBtn, { ICON_ONLY } from "../component/IconBtn";
@@ -46,6 +47,7 @@ const DEFAULT_FIELDS = {
     buyer_name: "",
     buyer_address: "",
     tests: [],
+    is_retest: false,
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
@@ -73,6 +75,7 @@ const getTestFields = dataSet => ({
     buyer_name: "Buyer Tom",
     buyer_address: "Buyer Building, Japan",
     tests: ["TEST 1", "TEST 2", "TEST 3"],
+    is_retest: true,
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
@@ -531,6 +534,14 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                         onChange={onChange}
                         autoComplete={testRequestedAutoComplete}
                         repeatable
+                        fullWidth
+                    />
+                    <BooleanInput
+                        label="This is a Retest"
+                        name="is_retest"
+                        value={fields.is_retest}
+                        errors={errors}
+                        onChange={onChange}
                         fullWidth
                     />
                     <ErrorMsg name="general" error={errors.general} />
