@@ -22,5 +22,55 @@
                 "required": true
             }
         }
+    },
+    {
+        "name": "applicant",
+        "path": "applicant.xlsx",
+        "schema": {
+            "Applicant name": {
+                "prop": "name",
+                "required": true
+            },
+            "Applicant address": {
+                "prop": "address",
+                "required": true
+            }
+        }
+    },
+    {
+        "name": "buyer",
+        "path": "buyer.xlsx",
+        "schema": {
+            "Buyer name": {
+                "prop": "name",
+                "required": true
+            },
+            "Buyer address": {
+                "prop": "address",
+                "required": true
+            },
+            "Applicant": {
+                "prop": "applicant",
+                "required": true
+            }
+        }
+    },
+    {
+        "name": "manufacturer",
+        "path": "manufacturer.xlsx",
+        "schema": {
+            "Manufacturer name": {
+                "prop": "name",
+                "required": true
+            },
+            "Manufacturer address": {
+                "prop": "address",
+                "required": true
+            },
+            "Applicant": {
+                "prop": "applicant",
+                "required": true
+            }
+        }
     }
 ]
