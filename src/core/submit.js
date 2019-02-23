@@ -87,6 +87,13 @@ const validateForm = composeValidate({
                 maxLength: 999
             })
         },
+        involed_divisions: {
+            type: "array",
+            items: SCHEMAS.STRING({
+                minLength: 1,
+                maxLength: 999
+            })
+        },
         is_retest: {
             type: "boolean"
         }

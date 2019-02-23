@@ -12,10 +12,12 @@ import DateInput from "../component/input/Date";
 import DropdownInput from "../component/input/Dropdown";
 import BooleanInput from "../component/input/Boolean";
 import ErrorMsg from "../component/input/ErrorMsg";
+import FormControlWithLabel from "../component/input/FormControlWithLabel";
 import Btn from "../component/Btn";
 import IconBtn, { ICON_ONLY } from "../component/IconBtn";
 import Divider from "../component/Divider";
 import SettingMenu from "../component/SettingMenu";
+import Chips from "../component/Chips";
 import FileLink from "../component/electron/FileLink";
 
 import Typography from "@material-ui/core/Typography";
@@ -99,6 +101,23 @@ const getInitialSettingName = (settings, defaultName) => {
     const names = Object.keys(settings);
     if (names.indexOf(defaultName) !== -1) return defaultName;
     return names[0];
+};
+
+const filterDivisions = (list, tests) => {
+    const testMapping = list.reduce((mapping, item) => {
+        mapping[item.test_name] = item.division;
+        return mapping;
+    }, {});
+
+    const divisionCache = tests.reduce((cache, testName) => {
+        const division = testMapping[testName];
+        if (!division) return cache;
+
+        cache[division] = true;
+        return cache;
+    }, {});
+
+    return Object.keys(divisionCache);
 };
 
 const reduceOnData = (dataSource, reducer) => changedFields => {
@@ -194,6 +213,12 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
         ...DEFAULT_FIELDS,
         template_name: templateNames[0]
     });
+
+    const involed_divisions = useMemo(
+        () => filterDivisions(dataSet.test, fields.tests),
+        [dataSet, fields.tests]
+    );
+
     const [errors, setErrors] = useState({});
     const [isLoading, setLoading] = useState(false);
     const [successStack, setSuccessStack] = useState(INITIAL_SUCCESS_STACK);
@@ -204,7 +229,11 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
 
         setLoading(true);
         try {
-            const filePath = submit({ settingName, ...fields });
+            const filePath = submit({
+                settingName,
+                involed_divisions,
+                ...fields
+            });
 
             setLoading(false);
             setErrors({});
@@ -625,7 +654,7 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                     <Divider />
                     <TextInputWithCheckbox
                         label="Test Requested (Optional)"
-                        placeholder="e.g. xxxx"
+                        placeholder="e.g. Japan Toy Safety Standard ST2016:Part 1"
                         name="tests"
                         value={fields.tests}
                         checkName="check_tests"
@@ -636,8 +665,22 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                         repeatable
                         fullWidth
                     />
+                    {involed_divisions.length ? (
+                        <FormControlWithLabel
+                            label="Division Involed"
+                            name="involed_divisions"
+                            fullWidth
+                        >
+                            <div style={{ marginTop: 16 }}>
+                                <Chips
+                                    list={involed_divisions}
+                                    variant="outlined"
+                                />
+                            </div>
+                        </FormControlWithLabel>
+                    ) : null}
                     <BooleanInput
-                        label="This is a Retest"
+                        label="Retest"
                         name="is_retest"
                         value={fields.is_retest}
                         errors={errors}
