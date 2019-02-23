@@ -201,6 +201,7 @@ export default withStyles(styles)(
                             classes,
                             InputProps: getInputProps({
                                 onChange: onInputChange,
+                                disabled,
                                 placeholder
                             }),
                             label,

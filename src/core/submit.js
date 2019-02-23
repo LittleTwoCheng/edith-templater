@@ -71,6 +71,14 @@ const validateForm = composeValidate({
             minLength: 1,
             maxLength: 9999
         }),
+        supplier_name: SCHEMAS.STRING({
+            minLength: 1,
+            maxLength: 999
+        }),
+        supplier_address: SCHEMAS.STRING({
+            minLength: 1,
+            maxLength: 9999
+        }),
         tests: {
             type: "array",
             minItems: 1,
@@ -88,6 +96,8 @@ const validateForm = composeValidate({
         "age_grade",
         "client_specified_testing_age_grade",
         "item_nos",
+        "supplier_name",
+        "supplier_address",
         "tests"
     ],
     required: [

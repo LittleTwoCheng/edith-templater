@@ -46,12 +46,16 @@ const DEFAULT_FIELDS = {
     manufacturer_address: "",
     buyer_name: "",
     buyer_address: "",
+    supplier_name: "",
+    supplier_address: "",
     tests: [],
     is_retest: false,
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
     check_item_nos: true,
+    check_supplier_name: false,
+    check_supplier_address: false,
     check_tests: true
 };
 const getTestFields = dataSet => ({
@@ -74,12 +78,16 @@ const getTestFields = dataSet => ({
     manufacturer_address: "Manufacturer Building, China",
     buyer_name: "Buyer Tom",
     buyer_address: "Buyer Building, Japan",
+    supplier_name: "Supplier Kelly",
+    supplier_address: "Supplier Center, Whereever",
     tests: ["TEST 1", "TEST 2", "TEST 3"],
     is_retest: true,
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
     check_item_nos: true,
+    check_supplier_name: true,
+    check_supplier_address: true,
     check_tests: true
 });
 
@@ -131,6 +139,24 @@ const resetIfApplicantNotMatch = (list, fields, target) => {
             [`${target}_name`]: "",
             [`${target}_address`]: ""
         };
+    };
+};
+
+const syncCheckableState = (name, syncTargets) => {
+    return changedFields => {
+        const check = changedFields[name];
+        console.log("syncCheckableState", {
+            name,
+            syncTargets,
+            check,
+            changedFields
+        });
+        if (typeof check === "undefined") return changedFields;
+
+        return syncTargets.reduce((merged, target) => {
+            merged[target] = check;
+            return merged;
+        }, changedFields);
     };
 };
 
@@ -397,6 +423,11 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                                                 dataSet.manufacturer,
                                                 fields,
                                                 "manufacturer"
+                                            ),
+                                            resetIfApplicantNotMatch(
+                                                dataSet.supplier,
+                                                fields,
+                                                "supplier"
                                             )
                                         )({
                                             ...accumulated,
@@ -520,6 +551,75 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                         value={fields.buyer_address}
                         errors={errors}
                         onChange={onChange}
+                        fullWidth
+                    />
+                    <Divider />
+                    <TextInputWithCheckbox
+                        label="Supplier Name"
+                        placeholder="e.g. Supplier CO., LTD"
+                        name="supplier_name"
+                        value={fields.supplier_name}
+                        checkName="check_supplier_name"
+                        checked={fields.check_supplier_name}
+                        errors={errors}
+                        onChange={onChange}
+                        autoComplete={useMemo(
+                            () => ({
+                                suggestions: dataSet.supplier
+                                    .filter(supplier => {
+                                        return (
+                                            !fields.applicant_name ||
+                                            supplier.applicant ===
+                                                fields.applicant_name
+                                        );
+                                    })
+                                    .map(supplier => ({
+                                        label: supplier.name,
+                                        tags: [supplier.applicant]
+                                    }))
+                            }),
+                            [dataSet, fields.applicant_name]
+                        )}
+                        data={{
+                            trigger: pipe(
+                                syncCheckableState("check_supplier_name", [
+                                    "check_supplier_address"
+                                ]),
+                                reduceOnData(
+                                    dataSet.supplier,
+                                    (accumulated, supplier, changedFields) => {
+                                        if (
+                                            supplier.name ===
+                                            changedFields.supplier_name
+                                        ) {
+                                            return {
+                                                ...accumulated,
+                                                check_supplier_address: true,
+                                                supplier_address:
+                                                    supplier.address
+                                            };
+                                        }
+                                        return accumulated;
+                                    }
+                                )
+                            )
+                        }}
+                        fullWidth
+                    />
+                    <TextInputWithCheckbox
+                        label="Supplier Address"
+                        name="supplier_address"
+                        value={fields.supplier_address}
+                        checkName="check_supplier_address"
+                        checked={fields.check_supplier_address}
+                        errors={errors}
+                        onChange={onChange}
+                        data={{
+                            trigger: syncCheckableState(
+                                "check_supplier_address",
+                                ["check_supplier_name"]
+                            )
+                        }}
                         fullWidth
                     />
                     <Divider />

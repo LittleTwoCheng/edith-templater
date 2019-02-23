@@ -12,6 +12,7 @@ export default ({
     onChange,
     errors = {},
     placeholder = "",
+    data = null,
     ...rest
 }) => (
     <Text
@@ -20,10 +21,16 @@ export default ({
         name={name}
         value={value}
         startAdornment={
-            <Checkbox name={checkName} checked={checked} onChange={onChange} />
+            <Checkbox
+                name={checkName}
+                checked={checked}
+                onChange={onChange}
+                data={data}
+            />
         }
         errors={errors}
         onChange={onChange}
+        data={data}
         {...rest}
         disabled={!checked}
     />

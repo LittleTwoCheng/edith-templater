@@ -72,5 +72,23 @@
                 "required": true
             }
         }
+    },
+    {
+        "name": "supplier",
+        "path": "supplier.xlsx",
+        "schema": {
+            "Supplier name": {
+                "prop": "name",
+                "required": true
+            },
+            "Supplier address": {
+                "prop": "address",
+                "required": true
+            },
+            "Applicant": {
+                "prop": "applicant",
+                "required": true
+            }
+        }
     }
 ]
