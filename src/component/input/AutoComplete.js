@@ -1,12 +1,12 @@
 import React, { Fragment, useState, useRef } from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
+import FormControlWithLabel from "./FormControlWithLabel";
+import BaseInput from "./BaseInput";
 import { withStyles } from "@material-ui/core/styles";
 import Downshift from "downshift";
 import Popper from "@material-ui/core/Popper";
 import Chips from "../Chips";
-import ErrorMsg from "./ErrorMsg";
 
 const styles = theme => ({
     formControl: {
@@ -53,43 +53,36 @@ function getSuggestions(autoComplete, value) {
     return result;
 }
 
-function renderInput(inputProps) {
+function renderInput(inputProps, extra) {
     const {
         InputProps,
         classes,
         ref,
         errors,
         helperText,
+        label,
         name,
         startAdornment,
+        fullWidth = false,
         ...other
     } = inputProps;
     // console.log("renderInput", { name, errors, helperText });
     return (
-        <TextField
-            className={classes.formControl}
-            error={!!errors[name]}
-            InputProps={{
-                inputRef: ref,
-                startAdornment,
-                ...InputProps
-            }}
-            InputLabelProps={{
-                htmlFor: name,
-                shrink: true
-            }}
-            helperText={
-                !!errors[name] || helperText ? (
-                    !!errors[name] ? (
-                        <ErrorMsg name={name} error={errors[name]} />
-                    ) : (
-                        helperText
-                    )
-                ) : null
-            }
+        <FormControlWithLabel
             name={name}
-            {...other}
-        />
+            label={label}
+            errors={errors}
+            fullWidth={fullWidth}
+            helperText={helperText}
+        >
+            <BaseInput
+                inputRef={ref}
+                startAdornment={startAdornment}
+                {...InputProps}
+                {...other}
+            />
+            {extra}
+        </FormControlWithLabel>
     );
 }
 
@@ -195,19 +188,39 @@ export default withStyles(styles)(
                     highlightedIndex
                 }) => (
                     <div>
-                        {renderInput({
-                            name,
-                            fullWidth,
-                            classes,
-                            InputProps: getInputProps({
-                                onChange: onInputChange,
-                                disabled,
-                                placeholder
-                            }),
-                            label,
-                            ref: popperNode,
-                            ...rest
-                        })}
+                        {renderInput(
+                            {
+                                name,
+                                fullWidth,
+                                classes,
+                                InputProps: getInputProps({
+                                    onChange: onInputChange,
+                                    disabled,
+                                    placeholder
+                                }),
+                                label,
+                                ref: popperNode,
+                                ...rest
+                            },
+                            repeatable ? (
+                                <Chips
+                                    list={value}
+                                    disabled={disabled}
+                                    onDelete={(label, idx) => {
+                                        let mutatedVal = [...value];
+                                        mutatedVal.splice(idx, 1);
+                                        onChange(
+                                            null,
+                                            {
+                                                [name]: mutatedVal
+                                            },
+                                            data
+                                        );
+                                        setSelectedItem(mutatedVal);
+                                    }}
+                                />
+                            ) : null
+                        )}
                         <Popper
                             open={isOpen}
                             anchorEl={popperNode.current}
@@ -257,24 +270,6 @@ export default withStyles(styles)(
                                 </Paper>
                             </div>
                         </Popper>
-                        {repeatable ? (
-                            <Chips
-                                list={value}
-                                disabled={disabled}
-                                onDelete={(label, idx) => {
-                                    let mutatedVal = [...value];
-                                    mutatedVal.splice(idx, 1);
-                                    onChange(
-                                        null,
-                                        {
-                                            [name]: mutatedVal
-                                        },
-                                        data
-                                    );
-                                    setSelectedItem(mutatedVal);
-                                }}
-                            />
-                        ) : null}
                     </div>
                 )}
             </Downshift>
