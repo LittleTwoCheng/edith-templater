@@ -2,6 +2,7 @@ import React, { Fragment, useState, useMemo } from "react";
 import submit from "../core/submit";
 import fnsFormat from "date-fns/format";
 import uuid from "../core/uuid";
+import pipe from "../core/pipe";
 
 import Page from "../component/Page";
 import Form from "../component/Form";
@@ -22,7 +23,6 @@ import SearchIcon from "@material-ui/icons/Search";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Slide from "@material-ui/core/Slide";
-import Chip from "@material-ui/core/Chip";
 
 import { withSnackbar } from "notistack";
 
@@ -90,6 +90,47 @@ const getInitialSettingName = (settings, defaultName) => {
     return names[0];
 };
 
+const reduceOnData = (dataSource, reducer) => changedFields => {
+    return dataSource.reduce((accumulated, item) => {
+        return reducer(accumulated, item, changedFields);
+    }, changedFields);
+};
+
+const matchApplicantName = (list, targetName, applicantName) => {
+    let match = false;
+    if (
+        list.some(item => {
+            if (item.name === targetName) {
+                match = item.applicant === applicantName;
+                return true;
+            }
+
+            return false;
+        })
+    ) {
+        console.log("FOUND", { targetName, applicantName, match });
+        return match;
+    }
+
+    return false;
+};
+
+const resetIfApplicantNotMatch = (list, fields, target) => {
+    return changedFields => {
+        const targetField = fields[`${target}_name`];
+        if (!targetField) return changedFields;
+
+        if (matchApplicantName(list, targetField, changedFields.applicant_name))
+            return changedFields;
+
+        return {
+            ...changedFields,
+            [`${target}_name`]: "",
+            [`${target}_address`]: ""
+        };
+    };
+};
+
 function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
     const countryOfOriginOptions = useMemo(
         () =>
@@ -127,7 +168,6 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
     const [errors, setErrors] = useState({});
     const [isLoading, setLoading] = useState(false);
     const [successStack, setSuccessStack] = useState(INITIAL_SUCCESS_STACK);
-    console.log("render", { fields, dataSet });
 
     const onSubmit = event => {
         event.stopPropagation();
@@ -171,12 +211,14 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
             });
         }
     };
-    const onChange = (event, changedFields) => {
-        console.log("field change", { changedFields });
+    const onChange = (event, changedFields, data) => {
+        console.log("field change", { changedFields, data });
 
         setFields({
             ...fields,
-            ...changedFields
+            ...(data && data.trigger
+                ? data.trigger(changedFields)
+                : changedFields)
         });
 
         //clean up error
@@ -190,7 +232,7 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
     const onTestClick = () => {
         setFields({ ...fields, ...getTestFields(dataSet) });
     };
-    console.log("App.render");
+    console.log("App.render", { fields, dataSet });
 
     return (
         <Fragment>
@@ -319,16 +361,54 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                     <Divider />
                     <TextInput
                         label="Applicant Client Name"
-                        placeholder="e.g. Joseph Whoever"
+                        placeholder="e.g. BANPRESTO (HK) LTD."
                         name="applicant_name"
                         value={fields.applicant_name}
                         errors={errors}
                         onChange={onChange}
+                        autoComplete={useMemo(
+                            () => ({
+                                suggestions: dataSet.applicant.map(
+                                    applicant => ({
+                                        label: applicant.name
+                                    })
+                                )
+                            }),
+                            [dataSet]
+                        )}
+                        data={{
+                            trigger: reduceOnData(
+                                dataSet.applicant,
+                                (accumulated, applicant, changedFields) => {
+                                    if (
+                                        applicant.name ===
+                                        changedFields.applicant_name
+                                    ) {
+                                        return pipe(
+                                            resetIfApplicantNotMatch(
+                                                dataSet.buyer,
+                                                fields,
+                                                "buyer"
+                                            ),
+                                            resetIfApplicantNotMatch(
+                                                dataSet.manufacturer,
+                                                fields,
+                                                "manufacturer"
+                                            )
+                                        )({
+                                            ...accumulated,
+                                            applicant_address: applicant.address
+                                        });
+                                    }
+
+                                    return accumulated;
+                                }
+                            )
+                        }}
                         fullWidth
                     />
                     <TextInput
                         label="Applicant Address"
-                        placeholder="e.g. YY Building, 8F, 1-11-11 XXX, Whereever, Tokyo Japan 106-0041"
                         name="applicant_address"
                         value={fields.applicant_address}
                         errors={errors}
@@ -338,16 +418,50 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                     <Divider />
                     <TextInput
                         label="Manufacturer Name"
-                        placeholder="e.g. HHH DDD INDUSTRIAL (HK) LIMITED"
+                        placeholder="e.g. Hua Lun Toys MFG. Ltd"
                         name="manufacturer_name"
                         value={fields.manufacturer_name}
                         errors={errors}
                         onChange={onChange}
+                        autoComplete={useMemo(
+                            () => ({
+                                suggestions: dataSet.manufacturer
+                                    .filter(manufacturer => {
+                                        return (
+                                            !fields.applicant_name ||
+                                            manufacturer.applicant ===
+                                                fields.applicant_name
+                                        );
+                                    })
+                                    .map(manufacturer => ({
+                                        label: manufacturer.name,
+                                        tags: [manufacturer.applicant]
+                                    }))
+                            }),
+                            [dataSet, fields.applicant_name]
+                        )}
+                        data={{
+                            trigger: reduceOnData(
+                                dataSet.manufacturer,
+                                (accumulated, manufacturer, changedFields) => {
+                                    if (
+                                        manufacturer.name ===
+                                        changedFields.manufacturer_name
+                                    ) {
+                                        return {
+                                            ...accumulated,
+                                            manufacturer_address:
+                                                manufacturer.address
+                                        };
+                                    }
+                                    return accumulated;
+                                }
+                            )
+                        }}
                         fullWidth
                     />
                     <TextInput
                         label="Manufacturer Address"
-                        placeholder="e.g. Xxx No2, Yy Village, LL Town, DongGuan City., China"
                         name="manufacturer_address"
                         value={fields.manufacturer_address}
                         errors={errors}
@@ -357,16 +471,48 @@ function App({ enqueueSnackbar, appData: { settings, dataSet } }) {
                     <Divider />
                     <TextInput
                         label="Buyer/Importer Name"
-                        placeholder="e.g. Buyer Whoever"
+                        placeholder="e.g. BANPRESTO CO., LTD"
                         name="buyer_name"
                         value={fields.buyer_name}
                         errors={errors}
                         onChange={onChange}
+                        autoComplete={useMemo(
+                            () => ({
+                                suggestions: dataSet.buyer
+                                    .filter(buyer => {
+                                        return (
+                                            !fields.applicant_name ||
+                                            buyer.applicant ===
+                                                fields.applicant_name
+                                        );
+                                    })
+                                    .map(buyer => ({
+                                        label: buyer.name,
+                                        tags: [buyer.applicant]
+                                    }))
+                            }),
+                            [dataSet, fields.applicant_name]
+                        )}
+                        data={{
+                            trigger: reduceOnData(
+                                dataSet.buyer,
+                                (accumulated, buyer, changedFields) => {
+                                    if (
+                                        buyer.name === changedFields.buyer_name
+                                    ) {
+                                        return {
+                                            ...accumulated,
+                                            buyer_address: buyer.address
+                                        };
+                                    }
+                                    return accumulated;
+                                }
+                            )
+                        }}
                         fullWidth
                     />
                     <TextInput
                         label="Buyer/Importer Address"
-                        placeholder="e.g. YY Building, 8F, 1-11-11 XXX, Whereever, Tokyo Japan 106-0041"
                         name="buyer_address"
                         value={fields.buyer_address}
                         errors={errors}
