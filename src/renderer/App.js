@@ -165,12 +165,7 @@ const resetIfApplicantNotMatch = (list, fields, target) => {
 const syncCheckableState = (name, syncTargets) => {
     return changedFields => {
         const check = changedFields[name];
-        console.log("syncCheckableState", {
-            name,
-            syncTargets,
-            check,
-            changedFields
-        });
+
         if (typeof check === "undefined") return changedFields;
 
         return syncTargets.reduce((merged, target) => {
@@ -678,7 +673,7 @@ function App({
                     />
                     {involed_divisions.length ? (
                         <FormControlWithLabel
-                            label="Division Involed"
+                            label="Divisions Involed"
                             name="involed_divisions"
                             fullWidth
                         >
