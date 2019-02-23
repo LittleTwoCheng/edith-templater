@@ -6,6 +6,9 @@ import { format as formatUrl } from "url";
 import getAppSettings from "./getAppSettings";
 import getTemplateNames from "./getTemplateNames";
 import getDataSetAsync from "./getDataSetAsync";
+import os from "os";
+import { config } from "dotenv";
+config();
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -71,6 +74,12 @@ const dataSetPromise = getDataSetAsync(__static);
 // create main BrowserWindow when electron is ready
 app.on("ready", () => {
   mainWindow = createMainWindow();
+
+  if (isDevelopment && process.env.REACT_DEVTOOL_PATH) {
+    BrowserWindow.addDevToolsExtension(
+      path.join(os.homedir(), process.env.REACT_DEVTOOL_PATH)
+    );
+  }
   mainWindow.webContents.on("did-finish-load", () => {
     dataSetPromise.then(dataSet => {
       const appData = {
