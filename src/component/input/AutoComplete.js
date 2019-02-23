@@ -1,22 +1,18 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useRef } from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
-import Chip from "@material-ui/core/Chip";
 import { withStyles } from "@material-ui/core/styles";
 import Downshift from "downshift";
 import Popper from "@material-ui/core/Popper";
+import Chips from "../Chips";
 import ErrorMsg from "./ErrorMsg";
 
 const styles = theme => ({
-    chips: {
-        display: "flex",
-        justifyContent: "left",
-        flexWrap: "wrap",
-        padding: theme.spacing.unit / 2
-    },
-    chip: {
-        margin: theme.spacing.unit / 2
+    formControl: {
+        padding: theme.spacing.unit / 2,
+        marginBottom: theme.spacing.unit * 2,
+        minWidth: "50%"
     },
     paper: {
         position: "absolute",
@@ -30,7 +26,7 @@ const styles = theme => ({
     },
     selectedSuggestion: {
         fontWeight: 500,
-        color: (console.log(theme), theme.palette.text.disabled)
+        color: theme.palette.text.disabled
     }
 });
 
@@ -39,20 +35,22 @@ function getSuggestions(autoComplete, value) {
     const inputLength = inputValue.length;
     let count = 0;
 
-    return inputLength === 0
-        ? []
-        : autoComplete.suggestions.filter(suggestion => {
-              const keep =
-                  count < 6 &&
-                  suggestion.label.slice(0, inputLength).toLowerCase() ===
-                      inputValue;
+    const result =
+        inputLength === 0
+            ? []
+            : autoComplete.suggestions.filter(suggestion => {
+                  const keep =
+                      count < 6 &&
+                      suggestion.label.slice(0, inputLength).toLowerCase() ===
+                          inputValue;
 
-              if (keep) {
-                  count += 1;
-              }
+                  if (keep) {
+                      count += 1;
+                  }
 
-              return keep;
-          });
+                  return keep;
+              });
+    return result;
 }
 
 function renderInput(inputProps) {
@@ -66,9 +64,11 @@ function renderInput(inputProps) {
         startAdornment,
         ...other
     } = inputProps;
-
+    // console.log("renderInput", { name, errors, helperText });
     return (
         <TextField
+            className={classes.formControl}
+            error={!!errors[name]}
             InputProps={{
                 inputRef: ref,
                 startAdornment,
@@ -111,16 +111,20 @@ const Suggestion = ({
     </MenuItem>
 );
 
-let popperNode = null;
-
 const defaultRenderSuggestion = suggestion => (
-    <span>
+    <Fragment>
         {suggestion.label}
-        {suggestion.tags && suggestion.tags.length ? "  " : ""}
-        {suggestion.tags.map((tag, index) => (
-            <Chip key={`${tag}-${index}`} label={tag} variant="outlined" />
-        ))}
-    </span>
+        {suggestion.tags && suggestion.tags.length ? (
+            <Fragment>
+                {"  "}
+                <Chips
+                    list={suggestion.tags}
+                    Component={null}
+                    variant="outlined"
+                />
+            </Fragment>
+        ) : null}
+    </Fragment>
 );
 
 export default withStyles(styles)(
@@ -140,8 +144,11 @@ export default withStyles(styles)(
         ...rest
     }) => {
         const [inputValue, setInputValue] = useState(repeatable ? "" : value);
+        const [selectedItem, setSelectedItem] = useState([]);
+        const popperNode = useRef(null);
 
         const onAutoCompleteChange = item => {
+            // console.log("🎯 onAutoCompleteChange", { item });
             if (repeatable) {
                 setInputValue("");
 
@@ -150,25 +157,33 @@ export default withStyles(styles)(
                 if (value.indexOf(item) !== -1) return;
                 const updatedVal = [...value, item];
                 onChange(null, { [name]: updatedVal }, data);
+                setSelectedItem(updatedVal);
                 return;
             }
             onChange(null, { [name]: item }, data);
             setInputValue(item);
+            setSelectedItem([item]);
         };
 
         const onInputChange = event => {
             setInputValue(event.target.value);
-
             if (!repeatable) {
                 onChange(null, { [name]: event.target.value }, data);
+                setSelectedItem([]);
             }
         };
 
+        // console.log("autoComplete render", {
+        //     name,
+        //     value,
+        //     inputValue,
+        //     selectedItem
+        // });
         return (
             <Downshift
                 onChange={onAutoCompleteChange}
-                inputValue={inputValue}
-                selectedItem={repeatable ? value : undefined}
+                inputValue={repeatable ? inputValue : value}
+                selectedItem={selectedItem}
                 itemToString={item => (item ? item.label : "")}
             >
                 {({
@@ -181,6 +196,7 @@ export default withStyles(styles)(
                 }) => (
                     <div>
                         {renderInput({
+                            name,
                             fullWidth,
                             classes,
                             InputProps: getInputProps({
@@ -188,14 +204,12 @@ export default withStyles(styles)(
                                 placeholder
                             }),
                             label,
-                            ref: node => {
-                                popperNode = node;
-                            },
+                            ref: popperNode,
                             ...rest
                         })}
                         <Popper
                             open={isOpen}
-                            anchorEl={popperNode}
+                            anchorEl={popperNode.current}
                             placement={"bottom-start"}
                         >
                             <div
@@ -211,14 +225,15 @@ export default withStyles(styles)(
                                     square
                                     style={{
                                         marginTop: 8,
-                                        width: popperNode
-                                            ? popperNode.clientWidth
-                                            : null
+                                        width:
+                                            popperNode && popperNode.current
+                                                ? popperNode.current.clientWidth
+                                                : null
                                     }}
                                 >
                                     {getSuggestions(
                                         autoComplete,
-                                        inputValue
+                                        repeatable ? inputValue : value
                                     ).map((suggestion, index) => (
                                         <Suggestion
                                             key={suggestion.label}
@@ -231,10 +246,9 @@ export default withStyles(styles)(
                                                 index === highlightedIndex
                                             }
                                             isSelected={
-                                                (repeatable
-                                                    ? value
-                                                    : [value]
-                                                ).indexOf(suggestion.label) > -1
+                                                selectedItem.indexOf(
+                                                    suggestion.label
+                                                ) > -1
                                             }
                                             render={renderSuggestion}
                                         />
@@ -243,46 +257,22 @@ export default withStyles(styles)(
                             </div>
                         </Popper>
                         {repeatable ? (
-                            <div className={classes.chips}>
-                                {value.map((val, idx) =>
-                                    val ? (
-                                        <Chip
-                                            key={`${val}-${idx}`}
-                                            label={val
-                                                .split("\n")
-                                                .map((item, key) => {
-                                                    return (
-                                                        <Fragment key={key}>
-                                                            {item}
-                                                            <br />
-                                                        </Fragment>
-                                                    );
-                                                })}
-                                            onDelete={
-                                                disabled
-                                                    ? null
-                                                    : () => {
-                                                          let mutatedVal = [
-                                                              ...value
-                                                          ];
-                                                          mutatedVal.splice(
-                                                              idx,
-                                                              1
-                                                          );
-                                                          onChange(
-                                                              null,
-                                                              {
-                                                                  [name]: mutatedVal
-                                                              },
-                                                              data
-                                                          );
-                                                      }
-                                            }
-                                            className={classes.chip}
-                                        />
-                                    ) : null
-                                )}
-                            </div>
+                            <Chips
+                                list={value}
+                                disabled={disabled}
+                                onDelete={(label, idx) => {
+                                    let mutatedVal = [...value];
+                                    mutatedVal.splice(idx, 1);
+                                    onChange(
+                                        null,
+                                        {
+                                            [name]: mutatedVal
+                                        },
+                                        data
+                                    );
+                                    setSelectedItem(mutatedVal);
+                                }}
+                            />
                         ) : null}
                     </div>
                 )}

@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
-import Chip from "@material-ui/core/Chip";
 import BaseInput from "./BaseInput";
+import Chips from "../Chips";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -66,30 +66,21 @@ export default withStyles(styles)(
                     disabled={disabled}
                     {...rest}
                 />
-                <div className={classes.chips}>
-                    {value.map((val, idx) =>
-                        val ? (
-                            <Chip
-                                key={`${val}-${idx}`}
-                                label={val}
-                                onDelete={
-                                    disabled
-                                        ? null
-                                        : () => {
-                                              let mutatedVal = [...value];
-                                              mutatedVal.splice(idx, 1);
-                                              onChange(
-                                                  null,
-                                                  { [name]: mutatedVal },
-                                                  data
-                                              );
-                                          }
-                                }
-                                className={classes.chip}
-                            />
-                        ) : null
-                    )}
-                </div>
+                <Chips
+                    list={value}
+                    disabled={disabled}
+                    onDelete={(label, idx) => {
+                        let mutatedVal = [...value];
+                        mutatedVal.splice(idx, 1);
+                        onChange(
+                            null,
+                            {
+                                [name]: mutatedVal
+                            },
+                            data
+                        );
+                    }}
+                />
             </Fragment>
         );
     }
