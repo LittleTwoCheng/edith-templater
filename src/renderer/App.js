@@ -512,7 +512,13 @@ function App({
                                     .map(manufacturer => ({
                                         label: manufacturer.name,
                                         tags: [manufacturer.applicant]
-                                    }))
+                                    })),
+                                noSuggestions: ({ inputValue }) =>
+                                    fields.applicant_name
+                                        ? `No Matching under Applicant "${
+                                              fields.applicant_name
+                                          }"`
+                                        : `No Matching for "${inputValue}"`
                             }),
                             [dataSet, fields.applicant_name]
                         )}
@@ -565,7 +571,13 @@ function App({
                                     .map(buyer => ({
                                         label: buyer.name,
                                         tags: [buyer.applicant]
-                                    }))
+                                    })),
+                                noSuggestions: ({ inputValue }) =>
+                                    fields.applicant_name
+                                        ? `No Matching under Applicant "${
+                                              fields.applicant_name
+                                          }"`
+                                        : `No Matching for "${inputValue}"`
                             }),
                             [dataSet, fields.applicant_name]
                         )}
@@ -618,7 +630,13 @@ function App({
                                     .map(supplier => ({
                                         label: supplier.name,
                                         tags: [supplier.applicant]
-                                    }))
+                                    })),
+                                noSuggestions: ({ inputValue }) =>
+                                    fields.applicant_name
+                                        ? `No Matching under Applicant "${
+                                              fields.applicant_name
+                                          }"`
+                                        : `No Matching for "${inputValue}"`
                             }),
                             [dataSet, fields.applicant_name]
                         )}

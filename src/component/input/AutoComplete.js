@@ -25,6 +25,10 @@ const styles = theme => ({
     suggestion: {
         fontWeight: 400
     },
+    noSuggestions: {
+        fontWeight: 500,
+        color: theme.palette.text.disabled
+    },
     selectedSuggestion: {
         fontWeight: 500,
         color: theme.palette.text.disabled
@@ -86,6 +90,46 @@ function renderInput(inputProps, extra) {
         </FormControlWithLabel>
     );
 }
+
+const Suggestions = ({
+    classes,
+    autoComplete,
+    inputValue,
+    getItemProps,
+    highlightedIndex,
+    selectedItem,
+    render
+}) => {
+    const suggestions = getSuggestions(autoComplete, inputValue);
+
+    if (suggestions.length)
+        return suggestions.map((suggestion, index) => (
+            <Suggestion
+                key={suggestion.label}
+                classes={classes}
+                suggestion={suggestion}
+                itemProps={getItemProps({
+                    item: suggestion.label
+                })}
+                isHighlighted={index === highlightedIndex}
+                isSelected={selectedItem.indexOf(suggestion.label) > -1}
+                render={render}
+            />
+        ));
+
+    if (!autoComplete.noSuggestions || inputValue.length === 0) return null;
+
+    return (
+        <MenuItem
+            selected={false}
+            component="div"
+            className={classes.noSuggestions}
+            disabled
+        >
+            {autoComplete.noSuggestions({ inputValue })}
+        </MenuItem>
+    );
+};
 
 const Suggestion = ({
     classes,
@@ -248,28 +292,17 @@ export default withStyles(styles)(
                                                 : null
                                     }}
                                 >
-                                    {getSuggestions(
-                                        autoComplete,
-                                        repeatable ? inputValue : value
-                                    ).map((suggestion, index) => (
-                                        <Suggestion
-                                            key={suggestion.label}
-                                            classes={classes}
-                                            suggestion={suggestion}
-                                            itemProps={getItemProps({
-                                                item: suggestion.label
-                                            })}
-                                            isHighlighted={
-                                                index === highlightedIndex
-                                            }
-                                            isSelected={
-                                                selectedItem.indexOf(
-                                                    suggestion.label
-                                                ) > -1
-                                            }
-                                            render={renderSuggestion}
-                                        />
-                                    ))}
+                                    <Suggestions
+                                        classes={classes}
+                                        autoComplete={autoComplete}
+                                        inputValue={
+                                            repeatable ? inputValue : value
+                                        }
+                                        getItemProps={getItemProps}
+                                        highlightedIndex={highlightedIndex}
+                                        selectedItem={selectedItem}
+                                        render={renderSuggestion}
+                                    />
                                 </Paper>
                             </div>
                         </Popper>
