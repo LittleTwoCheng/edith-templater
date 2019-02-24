@@ -73,11 +73,17 @@ export const compose = schema => {
         if (!result.valid)
             throw createError(
                 "Validation Failed.",
-                result.errors.reduce((merged, error) => {
-                    console.log({ error });
-                    merged[extractFieldName(error.dataPath)] = error.message;
-                    return merged;
-                }, {})
+                result.errors.reduce(
+                    (merged, error) => {
+                        console.log({ error });
+                        merged[extractFieldName(error.dataPath)] =
+                            error.message;
+                        return merged;
+                    },
+                    {
+                        general: "Validation fail."
+                    }
+                )
             );
 
         return true;

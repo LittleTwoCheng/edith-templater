@@ -4,6 +4,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import ErrorMsg from "./ErrorMsg";
+import ScrollIntoView from "../ScrollIntoView";
 
 const styles = theme => ({
     formControl: {
@@ -28,6 +29,7 @@ export default withStyles(styles)(
             error={!!errors[name]}
             fullWidth={fullWidth}
         >
+            <ScrollIntoView willScroll={!!errors[name]} check={errors} />
             <InputLabel htmlFor={name} shrink>
                 {label}
             </InputLabel>

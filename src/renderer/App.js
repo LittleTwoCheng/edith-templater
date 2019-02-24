@@ -693,7 +693,6 @@ function App({
                         onChange={onChange}
                         fullWidth
                     />
-                    <ErrorMsg name="general" error={errors.general} />
                     <Btn
                         variant="text"
                         color="secondary"
@@ -724,6 +723,7 @@ function App({
                     >
                         {isLoading ? "Loading" : "Submit"}
                     </IconBtn>
+                    <ErrorMsg name="general" error={errors.general} />
                 </Form>
             </Page>
             <Page elevation={4}>

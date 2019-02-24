@@ -1,4 +1,18 @@
 import React from "react";
+import { withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+
+const styles = theme => ({
+    error: {
+        color: theme.palette.error.main,
+        fontSize: "0.75rem",
+        textAlign: "left",
+        lineHeight: "1em"
+    },
+    general: {
+        textAlign: "center"
+    }
+});
 
 const getMsg = error => {
     if (!error) return "";
@@ -8,6 +22,11 @@ const getMsg = error => {
     return error.toString();
 };
 
-export default ({ name, error }) => (
-    <span className={`error error--${name}`}>{getMsg(error)}</span>
-);
+export default withStyles(styles)(({ classes, name, error }) => (
+    <Typography
+        className={`${classes.error} ${classes[name] || ""}`}
+        component="span"
+    >
+        {getMsg(error)}
+    </Typography>
+));
