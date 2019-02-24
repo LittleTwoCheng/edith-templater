@@ -13,6 +13,7 @@ export default ({
     errors = {},
     placeholder = "",
     data = null,
+    repeatable = false,
     ...rest
 }) => (
     <Text
@@ -24,13 +25,23 @@ export default ({
             <Checkbox
                 name={checkName}
                 checked={checked}
-                onChange={onChange}
+                onChange={(event, updatedFields, data) => {
+                    if (!updatedFields[checkName]) {
+                        return onChange(
+                            event,
+                            { ...updatedFields, [name]: repeatable ? [] : "" },
+                            data
+                        );
+                    }
+                    return onChange(event, updatedFields, data);
+                }}
                 data={data}
             />
         }
         errors={errors}
         onChange={onChange}
         data={data}
+        repeatable={repeatable}
         {...rest}
         disabled={!checked}
     />

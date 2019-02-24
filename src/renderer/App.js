@@ -167,12 +167,16 @@ const resetIfApplicantNotMatch = (list, fields, target) => {
 
 const syncCheckableState = (name, syncTargets) => {
     return changedFields => {
-        const check = changedFields[name];
+        const check = changedFields[`check_${name}`];
 
         if (typeof check === "undefined") return changedFields;
 
         return syncTargets.reduce((merged, target) => {
-            merged[target] = check;
+            merged[`check_${target}`] = check;
+            if (!check) {
+                // currently only support non-repeatable value
+                merged[target] = "";
+            }
             return merged;
         }, changedFields);
     };
@@ -620,8 +624,8 @@ function App({
                         )}
                         data={{
                             trigger: pipe(
-                                syncCheckableState("check_supplier_name", [
-                                    "check_supplier_address"
+                                syncCheckableState("supplier_name", [
+                                    "supplier_address"
                                 ]),
                                 reduceOnData(
                                     dataSet.supplier,
@@ -653,10 +657,9 @@ function App({
                         errors={errors}
                         onChange={onChange}
                         data={{
-                            trigger: syncCheckableState(
-                                "check_supplier_address",
-                                ["check_supplier_name"]
-                            )
+                            trigger: syncCheckableState("supplier_address", [
+                                "supplier_name"
+                            ])
                         }}
                         fullWidth
                     />
