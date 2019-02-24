@@ -24,8 +24,10 @@ const styles = theme => ({
 
 export default withStyles(styles)(
     ({ classes, path, time, dispatch, renderActions }) => {
-        const onOpenDoc = () =>
+        const onOpenDoc = event => {
+            event.preventDefault();
             dispatch({ type: "document.open", payload: { path } });
+        };
 
         return (
             <div className={classes.root}>

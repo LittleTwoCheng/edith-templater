@@ -7,6 +7,7 @@ import getAppSettings from "./getAppSettings";
 import getTemplateNames from "./getTemplateNames";
 import getDataSetAsync from "./getDataSetAsync";
 import os from "os";
+import throttle from "../core/throttle";
 import { config } from "dotenv";
 config();
 
@@ -87,14 +88,20 @@ function onAppEvent(event, action) {
   }
 }
 
+const shellOpenItemWithThrottle = throttle(
+  path => shell.openItem(path),
+  1000,
+  true
+);
 function reduceActions(store, { type, payload }) {
   switch (type) {
     case "document.open":
-      shell.openItem(payload.path);
+      shellOpenItemWithThrottle(payload.path);
       return null;
 
     default:
-    //do nothing
+      //do nothing
+      return null;
   }
 }
 
