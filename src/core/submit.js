@@ -96,7 +96,8 @@ const validateForm = composeValidate({
         },
         is_retest: {
             type: "boolean"
-        }
+        },
+        retest_date: SCHEMAS.DATE()
     },
     optional: [
         "labeled_age_grade",
@@ -119,7 +120,8 @@ const validateForm = composeValidate({
         "manufacturer_address",
         "buyer_name",
         "buyer_address",
-        "is_retest"
+        "is_retest",
+        "retest_date"
     ]
 });
 

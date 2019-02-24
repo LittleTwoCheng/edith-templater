@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import BaseInput from "./BaseInput";
 import Chips from "../Chips";
-
+import Collapse from "@material-ui/core/Collapse";
 import { withStyles } from "@material-ui/core/styles";
 
 const styles = theme => ({
@@ -66,21 +66,23 @@ export default withStyles(styles)(
                     disabled={disabled}
                     {...rest}
                 />
-                <Chips
-                    list={value}
-                    disabled={disabled}
-                    onDelete={(label, idx) => {
-                        let mutatedVal = [...value];
-                        mutatedVal.splice(idx, 1);
-                        onChange(
-                            null,
-                            {
-                                [name]: mutatedVal
-                            },
-                            data
-                        );
-                    }}
-                />
+                <Collapse in={value.length > 0}>
+                    <Chips
+                        list={value}
+                        disabled={disabled}
+                        onDelete={(label, idx) => {
+                            let mutatedVal = [...value];
+                            mutatedVal.splice(idx, 1);
+                            onChange(
+                                null,
+                                {
+                                    [name]: mutatedVal
+                                },
+                                data
+                            );
+                        }}
+                    />
+                </Collapse>
             </Fragment>
         );
     }

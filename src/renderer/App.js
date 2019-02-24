@@ -27,6 +27,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import PublishIcon from "@material-ui/icons/Publish";
 import Slide from "@material-ui/core/Slide";
+import Collapse from "@material-ui/core/Collapse";
 
 import { withSnackbar } from "notistack";
 
@@ -53,6 +54,7 @@ const DEFAULT_FIELDS = {
     supplier_address: "",
     tests: [],
     is_retest: false,
+    retest_date: TODAY_DATE,
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
@@ -85,6 +87,7 @@ const getTestFields = dataSet => ({
     supplier_address: "Supplier Center, Whereever",
     tests: ["TEST 1", "TEST 2", "TEST 3"],
     is_retest: true,
+    retest_date: "2019-02-27",
     check_labeled_age_grade: true,
     check_age_grade: true,
     check_client_specified_testing_age_grade: true,
@@ -671,7 +674,7 @@ function App({
                         repeatable
                         fullWidth
                     />
-                    {involed_divisions.length ? (
+                    <Collapse in={involed_divisions.length > 0}>
                         <FormControlWithLabel
                             label="Divisions Involed"
                             name="involed_divisions"
@@ -684,7 +687,7 @@ function App({
                                 />
                             </div>
                         </FormControlWithLabel>
-                    ) : null}
+                    </Collapse>
                     <BooleanInput
                         label="Retest"
                         name="is_retest"
@@ -693,6 +696,15 @@ function App({
                         onChange={onChange}
                         fullWidth
                     />
+                    <Collapse in={fields.is_retest}>
+                        <DateInput
+                            label="Retest Date"
+                            name="retest_date"
+                            value={fields.retest_date}
+                            errors={errors}
+                            onChange={onChange}
+                        />
+                    </Collapse>
                     <Btn
                         variant="text"
                         color="secondary"

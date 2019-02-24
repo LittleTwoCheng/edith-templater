@@ -7,6 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Downshift from "downshift";
 import Popper from "@material-ui/core/Popper";
 import Chips from "../Chips";
+import Collapse from "@material-ui/core/Collapse";
 
 const styles = theme => ({
     formControl: {
@@ -203,22 +204,24 @@ export default withStyles(styles)(
                                 ...rest
                             },
                             repeatable ? (
-                                <Chips
-                                    list={value}
-                                    disabled={disabled}
-                                    onDelete={(label, idx) => {
-                                        let mutatedVal = [...value];
-                                        mutatedVal.splice(idx, 1);
-                                        onChange(
-                                            null,
-                                            {
-                                                [name]: mutatedVal
-                                            },
-                                            data
-                                        );
-                                        setSelectedItem(mutatedVal);
-                                    }}
-                                />
+                                <Collapse in={value.length > 0}>
+                                    <Chips
+                                        list={value}
+                                        disabled={disabled}
+                                        onDelete={(label, idx) => {
+                                            let mutatedVal = [...value];
+                                            mutatedVal.splice(idx, 1);
+                                            onChange(
+                                                null,
+                                                {
+                                                    [name]: mutatedVal
+                                                },
+                                                data
+                                            );
+                                            setSelectedItem(mutatedVal);
+                                        }}
+                                    />
+                                </Collapse>
                             ) : null
                         )}
                         <Popper
