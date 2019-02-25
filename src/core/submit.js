@@ -1,5 +1,5 @@
 import createTemplate from "./createTemplate";
-import messageFields, { DATE, CUSTOM } from "./messageFields";
+import massageFields, { DATE, CUSTOM } from "./massageFields";
 
 import { compose as composeValidate, SCHEMAS } from "../form/validate";
 
@@ -139,6 +139,7 @@ const massageList = (fields, name) => {
 const formMessageMapping = {
     acceptance_date: DATE(),
     report_delivery_date: DATE(),
+    retest_date: DATE(),
     product_names: CUSTOM(massageList),
     item_nos: CUSTOM(massageList),
     tests: CUSTOM(massageList)
@@ -153,7 +154,7 @@ export default ({ settingName, template_name, ...fields }) => {
     validateForm(fields);
 
     return createTemplate(
-        messageFields(fields, formMessageMapping),
+        massageFields(fields, formMessageMapping),
         app.getPath("downloads"),
         __static + `/${settingName}/templates/${template_name}`,
         `Report_${fields.report_no}_`

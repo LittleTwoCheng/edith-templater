@@ -1,13 +1,13 @@
 import parse from "date-fns/parse";
 import fnsFormat from "date-fns/format";
 
-const messageFields = (fields, mapping) => {
+const massageFields = (fields, mapping) => {
     return Object.entries(mapping).reduce((merged, [name, typeMethod]) => {
         return typeMethod(merged, name);
     }, fields);
 };
 
-export default messageFields;
+export default massageFields;
 
 export const DATE = () => (fields, name) => ({
     ...fields,
