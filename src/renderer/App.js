@@ -316,27 +316,33 @@ function App({
                 >
                     {setting.subHeadline || "A tool to generate Docx file"}
                 </Typography>
-                <div style={{ position: "absolute", top: 5, right: 5 }}>
-                    <IconBtn
-                        variant="text"
-                        type="button"
-                        Icon={EditIcon}
-                        iconPosition={ICON_ONLY}
-                        title="Change Setting Profile"
-                        onClick={event =>
-                            setSettingMenuAnchorElement(event.currentTarget)
-                        }
-                    />
-                </div>
-                <SettingMenu
-                    anchorElement={settingMenuAnchorElement}
-                    onClose={() => setSettingMenuAnchorElement(null)}
-                    onChange={settingName => {
-                        setSettingName(settingName);
-                        setSettingMenuAnchorElement(null);
-                    }}
-                    settings={settings}
-                />
+                {settings.length > 1 ? (
+                    <Fragment>
+                        <div style={{ position: "absolute", top: 5, right: 5 }}>
+                            <IconBtn
+                                variant="text"
+                                type="button"
+                                Icon={EditIcon}
+                                iconPosition={ICON_ONLY}
+                                title="Change Setting Profile"
+                                onClick={event =>
+                                    setSettingMenuAnchorElement(
+                                        event.currentTarget
+                                    )
+                                }
+                            />
+                        </div>
+                        <SettingMenu
+                            anchorElement={settingMenuAnchorElement}
+                            onClose={() => setSettingMenuAnchorElement(null)}
+                            onChange={settingName => {
+                                setSettingName(settingName);
+                                setSettingMenuAnchorElement(null);
+                            }}
+                            settings={settings}
+                        />
+                    </Fragment>
+                ) : null}
                 <Form onSubmit={onSubmit}>
                     <TextInput
                         label="Report No."
