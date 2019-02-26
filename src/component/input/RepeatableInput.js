@@ -38,9 +38,9 @@ export default withStyles(styles)(
                     name={name}
                     value={inputValue}
                     onChange={event => {
-                        console.log("onChange", {
-                            val: event.target.value
-                        });
+                        // console.log("onChange", {
+                        //     val: event.target.value
+                        // });
                         setInputValue(event.target.value);
                     }}
                     onBlur={event => {

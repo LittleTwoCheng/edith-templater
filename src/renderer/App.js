@@ -142,7 +142,6 @@ const matchApplicantName = (list, targetName, applicantName) => {
             return false;
         })
     ) {
-        console.log("FOUND", { targetName, applicantName, match });
         return match;
     }
 
@@ -279,8 +278,6 @@ function App({
         }
     };
     const onChange = (event, changedFields, data) => {
-        console.log("field change", { changedFields, data });
-
         setFields({
             ...fields,
             ...(data && data.trigger
@@ -303,7 +300,7 @@ function App({
     const onTestClick = () => {
         setFields({ ...fields, ...getTestFields(dataSet) });
     };
-    console.log("App.render", { fields, dataSet });
+    // console.log("App.render", { fields, dataSet });
 
     return (
         <Fragment>
