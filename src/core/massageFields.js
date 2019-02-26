@@ -11,8 +11,8 @@ export default massageFields;
 
 export const DATE = () => (fields, name) => ({
     ...fields,
-    [name]: fnsFormat(parse(fields[name]), "DD MMM., YYYY")
-}); //11 Feb., 2019
+    [name]: fnsFormat(parse(fields[name]), "DD MMM, YYYY")
+}); //11 Feb, 2019
 export const EMPTY_TO = emptyValue => (fields, name) => ({
     ...fields,
     [name]: fields[name] ? fields[name] : emptyValue
