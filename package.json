@@ -11,7 +11,7 @@
       "webpackConfig": "webpack.renderer.additions.js"
     }
   },
-  "version": "1.2.2",
+  "version": "1.3.0",
   "license": "MIT",
   "scripts": {
     "dev": "electron-webpack dev",
