@@ -7,6 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Downshift from "downshift";
 import Popper from "@material-ui/core/Popper";
 import Chips from "../Chips";
+import PhaseHighlight from "../PhaseHighlight";
 import Collapse from "@material-ui/core/Collapse";
 
 const styles = theme => ({
@@ -37,17 +38,16 @@ const styles = theme => ({
 
 function getSuggestions(autoComplete, value) {
     const inputValue = value.trim().toLowerCase();
+    const regEx = new RegExp(inputValue, "gi");
     const inputLength = inputValue.length;
     let count = 0;
+
 
     const result =
         inputLength === 0
             ? []
             : autoComplete.suggestions.filter(suggestion => {
-                  const keep =
-                      count < 6 &&
-                      suggestion.label.slice(0, inputLength).toLowerCase() ===
-                          inputValue;
+                  const keep = count < 12 && regEx.test(suggestion.label.toLowerCase());
 
                   if (keep) {
                       count += 1;
@@ -111,6 +111,7 @@ const Suggestions = ({
                 itemProps={getItemProps({
                     item: suggestion.label
                 })}
+                inputValue={inputValue}
                 isHighlighted={index === highlightedIndex}
                 isSelected={selectedItem.indexOf(suggestion.label) > -1}
                 render={render}
@@ -134,6 +135,7 @@ const Suggestions = ({
 const Suggestion = ({
     classes,
     itemProps,
+    inputValue,
     suggestion,
     isHighlighted,
     isSelected,
@@ -145,13 +147,15 @@ const Suggestion = ({
         component="div"
         className={isSelected ? classes.selectedSuggestion : classes.suggestion}
     >
-        {render(suggestion)}
+        {render(suggestion, inputValue)}
     </MenuItem>
 );
 
-const defaultRenderSuggestion = suggestion => (
+const defaultRenderSuggestion = (suggestion, inputValue) => (
     <Fragment>
-        {suggestion.label}
+        <PhaseHighlight highlight={inputValue}>
+            {suggestion.label}
+        </PhaseHighlight>
         {suggestion.tags && suggestion.tags.length ? (
             <Fragment>
                 {"  "}
