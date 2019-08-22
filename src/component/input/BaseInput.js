@@ -11,6 +11,7 @@ export default ({
     placeholder = "",
     data = null,
     startAdornment = null,
+    endAdornment = null,
     ...rest
 }) => (
     <Input
@@ -25,6 +26,13 @@ export default ({
             startAdornment ? (
                 <InputAdornment position="start">
                     {startAdornment}
+                </InputAdornment>
+            ) : null
+        }
+        endAdornment={
+            endAdornment ? (
+                <InputAdornment position="end">
+                    {endAdornment}
                 </InputAdornment>
             ) : null
         }

@@ -33,6 +33,7 @@ export default withStyles(styles)(
         Component = "div",
         tooltipDelay = 200,
         onDelete = null,
+        onClick = null,
         data = null
     }) =>
         renderInner(
@@ -62,6 +63,11 @@ export default withStyles(styles)(
                             onDelete={
                                 onDelete && !disabled
                                     ? () => onDelete(label, idx, data)
+                                    : null
+                            }
+                            onClick={
+                                onClick && !disabled
+                                    ? () => onClick(label, idx, data)
                                     : null
                             }
                             variant={variant}

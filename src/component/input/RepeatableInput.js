@@ -3,6 +3,8 @@ import BaseInput from "./BaseInput";
 import Chips from "../Chips";
 import Collapse from "@material-ui/core/Collapse";
 import { withStyles } from "@material-ui/core/styles";
+import Add from "@material-ui/icons/Add";
+import IconBtn, { ICON_ONLY } from "../IconBtn";
 
 const styles = theme => ({
     chips: {
@@ -30,6 +32,13 @@ export default withStyles(styles)(
         ...rest
     }) => {
         const [inputValue, setInputValue] = useState("");
+        const add = event => {
+            if (!inputValue || !inputValue.length) return;
+
+            const updatedVal = [...value, inputValue];
+            onChange(event, { [name]: updatedVal }, data);
+            setInputValue("");
+        }
         return (
             <Fragment>
                 <BaseInput
@@ -43,25 +52,29 @@ export default withStyles(styles)(
                         // });
                         setInputValue(event.target.value);
                     }}
-                    onBlur={event => {
-                        if (!inputValue || !inputValue.length) return;
-
-                        const updatedVal = [...value, inputValue];
-                        onChange(event, { [name]: updatedVal }, data);
-                        setInputValue("");
-                    }}
                     onKeyPress={event => {
                         if (event.key === "Enter") {
                             event.preventDefault();
                             event.stopPropagation();
 
-                            if (!inputValue || !inputValue.length) return;
-
-                            const updatedVal = [...value, inputValue];
-                            onChange(event, { [name]: updatedVal }, data);
-                            setInputValue("");
+                            add(event);
                         }
                     }}
+                    endAdornment={
+                        <IconBtn
+                            variant="text"
+                            type="button"
+                            Icon={Add}
+                            iconPosition={ICON_ONLY}
+                            title="Add"
+                            onClick={event => {
+                                event.preventDefault();
+                                event.stopPropagation();
+
+                                add(event);
+                            }}
+                        />
+                    }
                     placeholder={placeholder}
                     disabled={disabled}
                     {...rest}
@@ -70,6 +83,9 @@ export default withStyles(styles)(
                     <Chips
                         list={value}
                         disabled={disabled}
+                        onClick={(label, idx) => {
+                            setInputValue(label)
+                        }}
                         onDelete={(label, idx) => {
                             let mutatedVal = [...value];
                             mutatedVal.splice(idx, 1);
