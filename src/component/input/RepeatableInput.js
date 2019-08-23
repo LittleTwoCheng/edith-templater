@@ -5,7 +5,7 @@ import Collapse from "@material-ui/core/Collapse";
 import { withStyles } from "@material-ui/core/styles";
 import Add from "@material-ui/icons/AddCircle";
 import IconBtn, { ICON_ONLY } from "../IconBtn";
-
+import arrayMove from "array-move";
 const styles = theme => ({
     chips: {
         display: "flex",
@@ -96,6 +96,15 @@ export default withStyles(styles)(
                                 null,
                                 {
                                     [name]: mutatedVal
+                                },
+                                data
+                            );
+                        }}
+                        onSort={({oldIndex, newIndex}) => {
+                            onChange(
+                                null,
+                                {
+                                    [name]: arrayMove(value, oldIndex, newIndex)
                                 },
                                 data
                             );
