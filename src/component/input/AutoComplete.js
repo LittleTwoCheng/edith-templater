@@ -38,7 +38,7 @@ const styles = theme => ({
 
 function getSuggestions(autoComplete, value) {
     const inputValue = value.trim().toLowerCase();
-    const regEx = new RegExp(inputValue, "gi");
+    const regEx = new RegExp(inputValue.replace(/\\/g, "\\\\"), "gi");
     const inputLength = inputValue.length;
     let count = 0;
 

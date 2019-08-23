@@ -164,6 +164,20 @@ const resetIfApplicantNotMatch = (list, fields, target) => {
   };
 };
 
+const syncFieldValueIfEqual = (fields, current, targets, equalValue) => {
+  return changedFields => {
+    if (!changedFields[current] || changedFields[current] !== equalValue) {
+      return changedFields;
+    }
+    return targets.reduce((merged, target) => {
+      return {
+        ...changedFields,
+        [target]: equalValue
+      };
+    }, changedFields);
+  };
+};
+
 const syncCheckableState = (name, syncTargets) => {
   return changedFields => {
     const check = changedFields[`check_${name}`];
@@ -230,6 +244,8 @@ function App({
   const [isLoading, setLoading] = useState(false);
   const [successStack, setSuccessStack] = useState(INITIAL_SUCCESS_STACK);
 
+  const [hasChange, setHasChange] = useState(false);
+
   const onSubmit = event => {
     event.stopPropagation();
     event.preventDefault();
@@ -278,6 +294,7 @@ function App({
     }
   };
   const onChange = (event, changedFields, data) => {
+    setHasChange(true);
     setFields({
       ...fields,
       ...(data && data.trigger ? data.trigger(changedFields) : changedFields)
@@ -398,7 +415,7 @@ function App({
           />
           <Divider />
           <TextInput
-            label="Product Name"
+            label="Product Name(s)"
             placeholder="e.g. Toy Chop 2 Piece Set"
             name="product_names"
             value={fields.product_names}
@@ -408,7 +425,7 @@ function App({
             fullWidth
           />
           <TextInputWithCheckbox
-            label="Item No. (Optional)"
+            label="Item Number(s) (Optional)"
             placeholder="e.g. 65432"
             name="item_nos"
             value={fields.item_nos}
@@ -482,7 +499,7 @@ function App({
           <Divider />
           <TextInput
             label="Manufacturer Name"
-            placeholder="e.g. Hua Lun Toys MFG. Ltd"
+            placeholder="e.g. Hua Lun Toys MFG. Ltd."
             name="manufacturer_name"
             value={fields.manufacturer_name}
             errors={errors}
@@ -508,19 +525,21 @@ function App({
               [dataSet, fields.applicant_name]
             )}
             data={{
-              trigger: reduceOnData(
-                dataSet.manufacturer,
-                (accumulated, manufacturer, changedFields) => {
-                  if (manufacturer.name === changedFields.manufacturer_name) {
-                    return {
-                      ...accumulated,
-                      manufacturer_address: manufacturer.address
-                    };
+              trigger: pipe(
+                syncFieldValueIfEqual(fields, "manufacturer_name", ["manufacturer_address"], "N/A"),
+                reduceOnData(
+                  dataSet.manufacturer,
+                  (accumulated, manufacturer, changedFields) => {
+                    if (manufacturer.name === changedFields.manufacturer_name) {
+                      return {
+                        ...accumulated,
+                        manufacturer_address: manufacturer.address
+                      };
+                    }
+                    return accumulated;
                   }
-                  return accumulated;
-                }
-              )
-            }}
+                )
+            )}}
             fullWidth
           />
           <TextInput
@@ -560,17 +579,20 @@ function App({
               [dataSet, fields.applicant_name]
             )}
             data={{
-              trigger: reduceOnData(
-                dataSet.buyer,
-                (accumulated, buyer, changedFields) => {
-                  if (buyer.name === changedFields.buyer_name) {
-                    return {
-                      ...accumulated,
-                      buyer_address: buyer.address
-                    };
+              trigger: pipe(
+                syncFieldValueIfEqual(fields, "buyer_name", ["buyer_address"], "N/A"),
+                reduceOnData(
+                  dataSet.buyer,
+                  (accumulated, buyer, changedFields) => {
+                    if (buyer.name === changedFields.buyer_name) {
+                      return {
+                        ...accumulated,
+                        buyer_address: buyer.address
+                      };
+                    }
+                    return accumulated;
                   }
-                  return accumulated;
-                }
+                )
               )
             }}
             fullWidth
@@ -648,7 +670,7 @@ function App({
           />
           <Divider />
           <TextInputWithCheckbox
-            label="Test Requested (Optional)"
+            label="Test(s) Requested (Optional)"
             placeholder="e.g. Japan Toy Safety Standard ST2016:Part 1"
             name="tests"
             value={fields.tests}
@@ -719,6 +741,23 @@ function App({
             {isLoading ? "Loading" : "Submit"}
           </IconBtn>
           <ErrorMsg name="general" error={errors.general} />
+          <Collapse in={hasChange}>
+            <IconBtn
+              variant="text"
+              color="secondary"
+              Icon={DeleteIcon}
+              onClick={() => {
+                setFields({
+                  ...DEFAULT_FIELDS,
+                  template_name: templateNames[0]
+                });
+                setHasChange(false);
+              }}
+              fullWidth
+            >
+              Reset
+            </IconBtn>
+          </Collapse>
         </Form>
       </Page>
       <Page elevation={4}>

@@ -3,7 +3,7 @@ import BaseInput from "./BaseInput";
 import Chips from "../Chips";
 import Collapse from "@material-ui/core/Collapse";
 import { withStyles } from "@material-ui/core/styles";
-import Add from "@material-ui/icons/Add";
+import Add from "@material-ui/icons/AddCircle";
 import IconBtn, { ICON_ONLY } from "../IconBtn";
 
 const styles = theme => ({
@@ -63,6 +63,9 @@ export default withStyles(styles)(
                     endAdornment={
                         <IconBtn
                             variant="text"
+                            iconProps={{
+                                color: "secondary"
+                            }}
                             type="button"
                             Icon={Add}
                             iconPosition={ICON_ONLY}

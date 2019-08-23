@@ -21,7 +21,7 @@ const PhaseHighlight = forwardRef(
         </span>
       );
 
-    const trimedHighlight = highlight.trim();
+    let trimedHighlight = highlight.trim();
     if (!trimedHighlight)
       return (
         <span ref={ref} className={classes.root}>
@@ -30,7 +30,7 @@ const PhaseHighlight = forwardRef(
       );
 
     const length = trimedHighlight.length;
-    const regEx = new RegExp(`${trimedHighlight.toLowerCase()}`, "gi");
+    const regEx = new RegExp(trimedHighlight.toLowerCase().replace(/\\/g, "\\\\"), "gi");
     const chunks = [];
     let target = children;
     let idx;

@@ -33,7 +33,20 @@ const mutateOptionals = (schema, fields) => {
     const mutatedSchema = { ...schema };
     const mutatedFields = { ...fields };
 
-    mutatedSchema.required = [...schema.required];
+    mutatedSchema.required = schema.required.reduce((acc, required) => {
+        if (typeof required === "string") {
+            acc.push(required);
+            return acc;
+        }
+
+        const [name, shouldRequire] = required;
+        if (shouldRequire(fields)) {
+            acc.push(name);
+        }
+        return acc;
+
+    }, []);
+
     schema.optional.forEach(name => {
         const checked = mutatedFields[`check_${name}`];
         if (typeof checked !== "undefined") {
