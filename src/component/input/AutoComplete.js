@@ -39,7 +39,7 @@ const styles = theme => ({
 
 function getSuggestions(autoComplete, value) {
   const inputValue = value.trim().toLowerCase();
-  const regEx = safeRegExp(inputValue);
+  const regEx = safeRegExp(inputValue, "i");
   const inputLength = inputValue.length;
   let count = 0;
 
